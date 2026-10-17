@@ -1,13 +1,13 @@
 # Alpha Quest — Project Status
 
-**Current Phase:** Phase 1 — Python Game Prototype
-**Active Task:**  Phase 1, Task 5 — Write unit tests
+**Current Phase:** Phase 2 — FastAPI Foundation
+**Active Task:**  Phase 2, Task 1 — Install FastAPI and Uvicorn
 **Last Updated:** 17 October 2026
 
 ---
 
 ## Completed Milestones
-- [x] Phase 1, Task 2-4: Question bank, game engine, XP, and leveling.
+- [x] Phase 1: Python Game Prototype (Questions, Engine, XP, Tests).
 
 ## Known Bugs / Issues
 - None at this time.
