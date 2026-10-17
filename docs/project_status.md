@@ -1,13 +1,13 @@
 # Alpha Quest — Project Status
 
 **Current Phase:** Phase 1 — Python Game Prototype
-**Active Task:** Phase 1, Task 1 — Set up prototype folder
+**Active Task:**  Phase 1, Task 5 — Write unit tests
 **Last Updated:** 17 October 2026
 
 ---
 
 ## Completed Milestones
-- [x] Phase 0: Project foundation, Git repo, documentation structure.
+- [x] Phase 1, Task 2-4: Question bank, game engine, XP, and leveling.
 
 ## Known Bugs / Issues
 - None at this time.

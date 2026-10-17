@@ -1,3 +1,4 @@
+
 # game.py
 # This is the main engine that runs the quiz.
 
@@ -5,6 +6,7 @@ from questions import QUESTIONS
 
 def play_game():
     score = 0
+    total_xp = 0
     total_questions = len(QUESTIONS)
     
     print("===================================")
@@ -26,6 +28,8 @@ def play_game():
         if answer == q['correct_answer']:
             print("\n✅ Correct!")
             score += 1
+            total_xp += 20  # Award 20 XP for a correct answer
+            print("✨ +20 XP")
         else:
             print(f"\n❌ Incorrect. The correct answer was {q['correct_answer']}.")
             
@@ -33,9 +37,13 @@ def play_game():
         print(f"Explanation: {q['explanation']}")
         print("-" * 35)
 
-    # Show final score
-    print(f"\n🏆 Game Over! You scored {score} out of {total_questions}.")
+    # Calculate Explorer Level (1 level for every 50 XP)
+    explorer_level = (total_xp // 50) + 1
 
-# This makes sure the game only runs if we execute this file directly
+    # Show final score and XP
+    print(f"\n🏆 Game Over! You scored {score} out of {total_questions}.")
+    print(f"⭐ Total XP Earned: {total_xp}")
+    print(f"🛡️ Explorer Level: {explorer_level}")
+
 if __name__ == "__main__":
     play_game()
