@@ -19,6 +19,10 @@ class Player(Base):
     nickname = Column(String, index=True)
     xp = Column(Integer, default=0)
 
+    # This special method tells Python how to print the object nicely
+    def __repr__(self):
+        return f"<Player(nickname='{self.nickname}', xp={self.xp})>"
+
 # 4. Create the tables in the database
 Base.metadata.create_all(bind=engine)
 
