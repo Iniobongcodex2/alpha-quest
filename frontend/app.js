@@ -77,8 +77,33 @@ function nextQuestion() {
         // Game Over
         document.getElementById('question-text').innerText = "Quest Complete!";
         document.getElementById('options-container').innerHTML = "";
-        document.getElementById('feedback-text').innerText = `You scored ${score} out of ${currentQuestions.length}!`;
+        document.getElementById('feedback-text').innerText = `You scored ${score} out of ${currentQuestions.length}! Saving progress...`;
         document.getElementById('feedback-text').style.color = "#C9A84C"; // Gold
         document.getElementById('next-btn').style.display = 'none';
+
+        // Send the score to the backend
+        const xpEarned = score * 20; // 20 XP per correct answer
+        const playerName = prompt("Enter your nickname to save your XP:", "Explorer");
+
+        if (playerName) {
+            fetch('/api/save-score', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nickname: playerName,
+                    xp: xpEarned
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('feedback-text').innerText = `You scored ${score}/${currentQuestions.length}! ${data.message}`;
+            })
+            .catch(error => {
+                console.error('Error saving score:', error);
+                document.getElementById('feedback-text').innerText = `You scored ${score}/${currentQuestions.length}! (Could not save score)`;
+            });
+        }
     }
 }
