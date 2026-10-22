@@ -2,17 +2,16 @@
 # Our FastAPI web server.
 
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from prototype.questions import QUESTIONS
 
 app = FastAPI()
 
-# Serve the frontend HTML file at the root URL
-@app.get("/")
-def read_root():
-    return FileResponse("frontend/index.html")
-
-# The API endpoint to get the questions
+# API endpoints go first
 @app.get("/api/questions")
 def get_questions():
     return {"questions": QUESTIONS}
+
+# Mount the frontend folder to serve index.html, app.js, and styles
+# The html=True argument makes it automatically serve index.html at the root URL
+app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
