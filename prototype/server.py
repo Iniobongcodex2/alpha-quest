@@ -2,16 +2,17 @@
 # Our FastAPI web server.
 
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from prototype.questions import QUESTIONS
 
 app = FastAPI()
 
-# The home page endpoint
+# Serve the frontend HTML file at the root URL
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the Alpha Quest API!"}
+    return FileResponse("frontend/index.html")
 
-# A new endpoint to get the questions
+# The API endpoint to get the questions
 @app.get("/api/questions")
 def get_questions():
     return {"questions": QUESTIONS}
