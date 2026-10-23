@@ -23,10 +23,18 @@ class Player(Base):
     def __repr__(self):
         return f"<Player(nickname='{self.nickname}', xp={self.xp})>"
 
-# 4. Create the tables in the database
+# 4. Define our second table: Buildings
+class Building(Base):
+    __tablename__ = "buildings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    player_id = Column(Integer, index=True)
+    building_type = Column(String, index=True)
+
+# 5. Create the tables in the database
 Base.metadata.create_all(bind=engine)
 
-# 5. Set up a session to interact with the database later
+# 6. Set up a session to interact with the database later
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 print("Database and tables created successfully using SQLAlchemy!")

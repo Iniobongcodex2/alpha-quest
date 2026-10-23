@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Builder - Alpha Quest</title>
+    <style>
+        body {
+            background-color: #0A1E3D; /* Navy */
+            color: #FFFFFF;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 50px;
+            margin: 0;
+        }
+        h1 { color: #C9A84C; } /* Gold */
+        .xp-display {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            background-color: #1A4B8C;
+            padding: 15px 30px;
+            border-radius: 10px;
+        }
+        .build-area {
+            background-color: #2D3748; /* Dark Gray */
+            width: 400px;
+            height: 300px;
+            border-radius: 15px;
+            border: 3px dashed #C9A84C;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin-bottom: 30px;
+        }
+        button {
+            background-color: #1A4B8C;
+            color: #FFFFFF;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover { background-color: #C9A84C; color: #0A1E3D; }
+        button:disabled { background-color: #555; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+    <h1>Knowledge Builder</h1>
+    
+    <div class="xp-display">
+        Your XP: <span id="player-xp">Loading...</span>
+    </div>
+
+    <div class="build-area" id="build-area">
+        <p>Your land is empty.</p>
+    </div>
+
+    <button id="build-btn" onclick="buildStructure()">Build Library (Cost: 50 XP)</button>
+
+    <script src="builder.js"></script>
+</body>
+</html>
