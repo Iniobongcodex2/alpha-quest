@@ -1,40 +1,51 @@
 # database.py
-# This file sets up our SQLite database and defines our tables.
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 
-from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.orm import declarative_base, sessionmaker
-
-# 1. Create the database engine (this creates a file named alpha_quest.db)
 DATABASE_URL = "sqlite:///./alpha_quest.db"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-
-# 2. Create a base class for our models
 Base = declarative_base()
 
-# 3. Define our first table: Players
+# 1. Player Table
 class Player(Base):
     __tablename__ = "players"
-
     id = Column(Integer, primary_key=True, index=True)
     nickname = Column(String, index=True)
     xp = Column(Integer, default=0)
+    
+    # Relationship to buildings
+    buildings = relationship("Building", back_populates="owner")
 
-    # This special method tells Python how to print the object nicely
     def __repr__(self):
         return f"<Player(nickname='{self.nickname}', xp={self.xp})>"
 
-# 4. Define our second table: Buildings
+# 2. Building Table
 class Building(Base):
     __tablename__ = "buildings"
-
     id = Column(Integer, primary_key=True, index=True)
-    player_id = Column(Integer, index=True)
-    building_type = Column(String, index=True)
+    player_id = Column(Integer, ForeignKey("players.id"))
+    building_type = Column(String)
 
-# 5. Create the tables in the database
+    owner = relationship("Player", back_populates="buildings")
+
+    def __repr__(self):
+        return f"<Building(type='{self.building_type}')>"
+
+# 3. Question Table
+class Question(Base):
+    __tablename__ = "questions"
+    id = Column(Integer, primary_key=True, index=True)
+    subject = Column(String, index=True)
+    prompt = Column(String)
+    options = Column(String) 
+    correct_answer = Column(String)
+    explanation = Column(String)
+
+    def __repr__(self):
+        return f"<Question(prompt='{self.prompt}')>"
+
+# 4. Create the tables
 Base.metadata.create_all(bind=engine)
-
-# 6. Set up a session to interact with the database later
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 print("Database and tables created successfully using SQLAlchemy!")

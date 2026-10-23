@@ -1,8 +1,8 @@
 # Alpha Quest — Project Status
 
-**Current Phase:** Phase 5 — Save Progress to Database
-**Active Task:** Phase 5, Task 1 — Create API endpoint for saving scores
-**Last Updated:** 22 October 2026
+**Current Phase:** Phase 6 — Content & Teacher Tools
+**Active Task:** Phase 6, Task 1 — Fetch questions from the database
+**Last Updated:** 23 October 2026
 
 ---
 
@@ -12,13 +12,14 @@
 - [x] Phase 2: FastAPI web server and API endpoints.
 - [x] Phase 3: SQLAlchemy database, Player model, and seed script.
 - [x] Phase 4: Complete game loop in browser with feedback and scoring.
+- [x] Phase 5: Knowledge Builder implemented, connects to API, and saves buildings permanently to the database.
 
 ## Known Bugs / Issues
 - None at this time.
 
 ## Next Steps
-1. Phase 5, Task 1: Create the `/api/save-score` POST endpoint in FastAPI.
-2. Phase 5, Task 2: Update `app.js` to send the final score to the backend when the game ends.
+1. Phase 6, Task 1: Update `server.py` to fetch the quiz questions from the SQLite database instead of the hardcoded `questions.py` file.
+2. Phase 6, Task 2: Build the Teacher Dashboard.
 
 ## Important Notes
 - Files are currently in a folder named `Alpha_quest_game.py` (a folder with a `.py` suffix). We will rename this in a future task to avoid confusion.

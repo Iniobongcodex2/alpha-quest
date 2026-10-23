@@ -1,13 +1,13 @@
 # server.py
+import ast
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from prototype.questions import QUESTIONS
-from prototype.database import SessionLocal, Player
+from prototype.database import SessionLocal, Player, Building, Question
 
 app = FastAPI()
 
-# --- Schemas for incoming data ---
+# --- Models ---
 class ScoreData(BaseModel):
     nickname: str
     xp: int
@@ -16,27 +16,56 @@ class SpendData(BaseModel):
     nickname: str
     amount: int
 
-# --- API Endpoints ---
+# --- API ROUTES (Must be above app.mount) ---
 
 @app.get("/api/questions")
 def get_questions():
-    return {"questions": QUESTIONS}
+    # Fetch questions from the database
+    db = SessionLocal()
+    questions = db.query(Question).all()
+    db.close()
+    
+    formatted_questions = []
+    for q in questions:
+        try:
+            # This safely turns the text "['A) Mars', 'B) Earth']" back into a real Python list
+            parsed_options = ast.literal_eval(q.options)
+        except Exception:
+            # If there's an error, fallback to a simple split
+            parsed_options = q.options.split(", ")
+            
+        formatted_questions.append({
+            "id": q.id,
+            "subject": q.subject,
+            "prompt": q.prompt,
+            "options": parsed_options,
+            "correct_answer": q.correct_answer,
+            "explanation": q.explanation
+        })
+        
+    return {"questions": formatted_questions}
 
 @app.post("/api/save-score")
 def save_score(data: ScoreData):
     db = SessionLocal()
-    # Find the player or create a new one
     player = db.query(Player).filter(Player.nickname == data.nickname).first()
-    
     if player:
         player.xp += data.xp
     else:
         player = Player(nickname=data.nickname, xp=data.xp)
         db.add(player)
-    
     db.commit()
     db.close()
     return {"message": "Score saved successfully!"}
+
+@app.get("/api/player/{nickname}")
+def get_player(nickname: str):
+    db = SessionLocal()
+    player = db.query(Player).filter(Player.nickname == nickname).first()
+    db.close()
+    if not player:
+        raise HTTPException(status_code=404, detail="Player not found")
+    return {"nickname": player.nickname, "xp": player.xp}
 
 @app.post("/api/spend-xp")
 def spend_xp(data: SpendData):
@@ -52,20 +81,26 @@ def spend_xp(data: SpendData):
         raise HTTPException(status_code=400, detail="Not enough XP")
     
     player.xp -= data.amount
+    new_building = Building(player_id=player.id, building_type="Library")
+    db.add(new_building)
+    
     db.commit()
     new_xp = player.xp
     db.close()
     
-    return {"message": "XP spent successfully", "new_xp": new_xp}
+    return {"message": "XP spent and library built!", "new_xp": new_xp}
 
-@app.get("/api/player/{nickname}")
-def get_player(nickname: str):
+@app.get("/api/buildings/{nickname}")
+def get_buildings(nickname: str):
     db = SessionLocal()
     player = db.query(Player).filter(Player.nickname == nickname).first()
-    db.close()
     if not player:
+        db.close()
         raise HTTPException(status_code=404, detail="Player not found")
-    return {"nickname": player.nickname, "xp": player.xp}
+    
+    buildings = db.query(Building).filter(Building.player_id == player.id).all()
+    db.close()
+    return {"buildings": [b.building_type for b in buildings]}
 
-# --- Serve the frontend ---
+# --- STATIC FILES (Must be the VERY LAST line) ---
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")

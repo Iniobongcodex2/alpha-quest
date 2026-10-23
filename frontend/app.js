@@ -44,7 +44,12 @@ function showQuestion() {
 
 function checkAnswer(selectedOption, clickedButton) {
     const question = currentQuestions[currentQuestionIndex];
-    const selectedLetter = selectedOption.charAt(0);
+    
+    // THIS IS THE FIX: This finds the first A, B, C, or D in the string, 
+    // ignoring any quotes or spaces.
+    const match = selectedOption.match(/[A-D]/);
+    const selectedLetter = match ? match[0] : "";
+    
     const feedbackText = document.getElementById('feedback-text');
 
     // Disable all option buttons so they can't click twice
@@ -99,6 +104,11 @@ function nextQuestion() {
             .then(response => response.json())
             .then(data => {
                 document.getElementById('feedback-text').innerText = `You scored ${score}/${currentQuestions.length}! ${data.message}`;
+                
+                // Wait 2 seconds, then go to the Knowledge Builder!
+                setTimeout(() => {
+                    window.location.href = `builder.html?nickname=${encodeURIComponent(playerName)}`;
+                }, 2000);
             })
             .catch(error => {
                 console.error('Error saving score:', error);
