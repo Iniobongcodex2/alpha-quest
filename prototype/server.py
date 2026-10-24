@@ -25,10 +25,7 @@ def get_questions():
     questions = db.query(Question).all()
     db.close()
     
-    # Shuffle the questions so it's different every time
     random.shuffle(questions)
-    
-    # Limit to 5 questions per game
     questions = questions[:5] 
     
     formatted_questions = []
@@ -106,11 +103,9 @@ def get_buildings(nickname: str):
     db.close()
     return {"buildings": [b.building_type for b in buildings]}
 
-# --- NEW LEADERBOARD ENDPOINT ---
 @app.get("/api/leaderboard")
 def get_leaderboard():
     db = SessionLocal()
-    # Query all players, sort them by XP in descending order, and limit to the top 10
     top_players = db.query(Player).order_by(Player.xp.desc()).limit(10).all()
     db.close()
     
@@ -120,5 +115,5 @@ def get_leaderboard():
     
     return {"leaderboard": leaderboard_data}
 
-# --- STATIC FILES (Must be the VERY LAST line) ---
+# --- STATIC FILES ---
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
