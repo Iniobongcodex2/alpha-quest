@@ -26,7 +26,7 @@ def get_questions():
     db.close()
     
     random.shuffle(questions)
-    questions = questions[:5] 
+    questions = questions[:10] 
     
     formatted_questions = []
     for q in questions:
