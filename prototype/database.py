@@ -3,17 +3,31 @@
 let currentQuestions = [];
 let currentQuestionIndex = 0;
 let score = 0;
-let playerName = "Explorer"; // We will ask for this at the end, but need a default
+let playerName = "Explorer"; 
 
 async function startGame() {
-    const response = await fetch('/api/questions');
+    // 1. Get the name from the input box
+    const inputField = document.getElementById('nickname-input');
+    if (inputField && inputField.value.trim() !== "") {
+        playerName = inputField.value.trim();
+    }
+
+    // 2. Send the nickname to the backend so the Memory Vault can find their past mistakes!
+    const response = await fetch(`/api/questions?nickname=${encodeURIComponent(playerName)}`);
     const data = await response.json();
     
+    if (data.questions.length === 0) {
+        alert("No questions available right now.");
+        return;
+    }
+
     currentQuestions = data.questions;
     currentQuestionIndex = 0;
-    score = 0; // Reset score
+    score = 0; 
 
+    // 3. Hide the start screen and show the game
     document.getElementById('start-btn').style.display = 'none';
+    if (inputField) inputField.style.display = 'none';
     document.getElementById('game-screen').style.display = 'block';
 
     showQuestion();
@@ -95,31 +109,27 @@ function nextQuestion() {
         document.getElementById('next-btn').style.display = 'none';
 
         const xpEarned = score * 20;
-        const inputName = prompt("Enter your nickname to save your XP:", "Explorer");
-
-        if (inputName) {
-            playerName = inputName; // Update the global player name
+        
+        // No more prompt! We already have the playerName from the start of the game.
+        fetch('/api/save-score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                nickname: playerName,
+                xp: xpEarned
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('feedback-text').innerText = `You scored ${score}/${currentQuestions.length}! ${data.message}`;
             
-            fetch('/api/save-score', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    nickname: playerName,
-                    xp: xpEarned
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('feedback-text').innerText = `You scored ${score}/${currentQuestions.length}! ${data.message}`;
-                
-                setTimeout(() => {
-                    window.location.href = `builder.html?nickname=${encodeURIComponent(playerName)}`;
-                }, 2000);
-            })
-            .catch(error => {
-                console.error('Error saving score:', error);
-                document.getElementById('feedback-text').innerText = `You scored ${score}/${currentQuestions.length}! (Could not save score)`;
-            });
-        }
+            setTimeout(() => {
+                window.location.href = `builder.html?nickname=${encodeURIComponent(playerName)}`;
+            }, 2000);
+        })
+        .catch(error => {
+            console.error('Error saving score:', error);
+            document.getElementById('feedback-text').innerText = `You scored ${score}/${currentQuestions.length}! (Could not save score)`;
+        });
     }
 }
