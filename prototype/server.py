@@ -25,13 +25,41 @@ class AttemptData(BaseModel):
 # --- API ROUTES ---
 
 @app.get("/api/questions")
-def get_questions():
+def get_questions(nickname: str = None):
     db = SessionLocal()
-    questions = db.query(Question).all()
-    db.close()
+    all_questions = db.query(Question).all()
     
-    random.shuffle(questions)
-    questions = questions[:10] 
+    if nickname:
+        player = db.query(Player).filter(Player.nickname == nickname).first()
+        if player:
+            # MEMORY VAULT LOGIC: Find questions this player previously got wrong
+            wrong_attempts = db.query(Attempt).filter(
+                Attempt.player_id == player.id, 
+                Attempt.is_correct == 0
+            ).all()
+            
+            wrong_q_ids = list(set([a.question_id for a in wrong_attempts]))
+            
+            # Separate into "needs review" and "other"
+            review_questions = [q for q in all_questions if q.id in wrong_q_ids]
+            other_questions = [q for q in all_questions if q.id not in wrong_q_ids]
+            
+            random.shuffle(review_questions)
+            random.shuffle(other_questions)
+            
+            # Priority: Put the ones they got wrong first!
+            questions = review_questions + other_questions
+            questions = questions[:10] 
+        else:
+            # New player, just shuffle and pick 10
+            random.shuffle(all_questions)
+            questions = all_questions[:10]
+    else:
+        # No nickname provided, just shuffle
+        random.shuffle(all_questions)
+        questions = all_questions[:10]
+
+    db.close()
     
     formatted_questions = []
     for q in questions:
@@ -69,7 +97,6 @@ def save_attempt(data: AttemptData):
     db = SessionLocal()
     player = db.query(Player).filter(Player.nickname == data.nickname).first()
     
-    # If the player doesn't exist yet, create them so we can track their attempts
     if not player:
         player = Player(nickname=data.nickname, xp=0)
         db.add(player)

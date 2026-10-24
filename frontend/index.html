@@ -30,6 +30,18 @@
             color: #F4F6F9; /* Light Gray */
             margin-bottom: 30px;
         }
+        .nickname-input {
+            padding: 12px;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: none;
+            margin-bottom: 20px;
+            text-align: center;
+            width: 100%;
+            max-width: 280px;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
         .start-button {
             background-color: #1A4B8C; /* Blue */
             color: #FFFFFF;
@@ -73,6 +85,10 @@
     <div>
         <h1>ALPHA QUEST</h1>
         <p>Learn. Explore. Achieve.</p>
+        
+        <!-- NEW: Nickname Input -->
+        <input type="text" id="nickname-input" class="nickname-input" placeholder="Enter your nickname">
+        <br>
         
         <!-- The Start Button -->
         <button class="start-button" id="start-btn" onclick="startGame()">Start Your Journey</button>

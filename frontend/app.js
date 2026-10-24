@@ -3,16 +3,28 @@
 let currentQuestions = [];
 let currentQuestionIndex = 0;
 let score = 0;
+let playerName = "Explorer"; // Default name
 
 async function startGame() {
-    const response = await fetch('/api/questions');
+    // 1. Get the name from the input box
+    const inputField = document.getElementById('nickname-input');
+    if (inputField && inputField.value.trim() !== "") {
+        playerName = inputField.value.trim();
+    }
+
+    // 2. Fetch questions passing the nickname so the Memory Vault can find past mistakes
+    const response = await fetch(`/api/questions?nickname=${encodeURIComponent(playerName)}`);
     const data = await response.json();
     
     currentQuestions = data.questions;
     currentQuestionIndex = 0;
     score = 0; // Reset score
 
+    // 3. Hide the start screen elements and show the game
     document.getElementById('start-btn').style.display = 'none';
+    if (inputField) inputField.style.display = 'none'; 
+    document.querySelector('.leaderboard-link').style.display = 'none'; // Hide leaderboard link during game
+    
     document.getElementById('game-screen').style.display = 'block';
 
     showQuestion();
@@ -49,31 +61,41 @@ function showQuestion() {
 function checkAnswer(selectedOption, clickedButton) {
     const question = currentQuestions[currentQuestionIndex];
     
-    // This finds the first A, B, C, or D in the string, 
-    // ignoring any quotes or spaces.
     const match = selectedOption.match(/[A-D]/);
     const selectedLetter = match ? match[0] : "";
     
     const feedbackText = document.getElementById('feedback-text');
 
-    // Disable all option buttons so they can't click twice
     const allButtons = document.getElementById('options-container').children;
     for (let btn of allButtons) {
         btn.disabled = true;
     }
+
+    let isCorrect = false;
 
     if (selectedLetter === question.correct_answer) {
         feedbackText.innerText = "✅ Correct! " + question.explanation;
         feedbackText.style.color = "#4CAF50"; // Green
         clickedButton.style.backgroundColor = "#4CAF50";
         score++;
+        isCorrect = true;
     } else {
         feedbackText.innerText = "❌ Incorrect. The correct answer was " + question.correct_answer + ". " + question.explanation;
         feedbackText.style.color = "#F44336"; // Red
         clickedButton.style.backgroundColor = "#F44336";
     }
 
-    // Show the Next button
+    // --- MEMORY VAULT: Save this attempt! ---
+    fetch('/api/save-attempt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            nickname: playerName,
+            question_id: question.id,
+            is_correct: isCorrect
+        })
+    });
+
     document.getElementById('next-btn').style.display = 'inline-block';
 }
 
@@ -90,34 +112,31 @@ function nextQuestion() {
         document.getElementById('feedback-text').style.color = "#C9A84C"; // Gold
         document.getElementById('next-btn').style.display = 'none';
 
-        // Send the score to the backend
+        // Send the final score to the backend
         const xpEarned = score * 20; // 20 XP per correct answer
-        const playerName = prompt("Enter your nickname to save your XP:", "Explorer");
 
-        if (playerName) {
-            fetch('/api/save-score', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    nickname: playerName,
-                    xp: xpEarned
-                })
+        fetch('/api/save-score', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nickname: playerName,
+                xp: xpEarned
             })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('feedback-text').innerText = `You scored ${score}/${currentQuestions.length}! ${data.message}`;
-                
-                // Wait 2 seconds, then go to the Knowledge Builder!
-                setTimeout(() => {
-                    window.location.href = `builder.html?nickname=${encodeURIComponent(playerName)}`;
-                }, 2000);
-            })
-            .catch(error => {
-                console.error('Error saving score:', error);
-                document.getElementById('feedback-text').innerText = `You scored ${score}/${currentQuestions.length}! (Could not save score)`;
-            });
-        }
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('feedback-text').innerText = `You scored ${score}/${currentQuestions.length}! ${data.message}`;
+            
+            // Wait 2 seconds, then go to the Knowledge Builder!
+            setTimeout(() => {
+                window.location.href = `builder.html?nickname=${encodeURIComponent(playerName)}`;
+            }, 2000);
+        })
+        .catch(error => {
+            console.error('Error saving score:', error);
+            document.getElementById('feedback-text').innerText = `You scored ${score}/${currentQuestions.length}! (Could not save score)`;
+        });
     }
 }
