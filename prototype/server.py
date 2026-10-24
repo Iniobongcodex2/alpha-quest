@@ -4,7 +4,7 @@ import ast
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from prototype.database import SessionLocal, Player, Building, Question
+from prototype.database import SessionLocal, Player, Building, Question, Attempt
 
 app = FastAPI()
 
@@ -16,6 +16,11 @@ class ScoreData(BaseModel):
 class SpendData(BaseModel):
     nickname: str
     amount: int
+
+class AttemptData(BaseModel):
+    nickname: str
+    question_id: int
+    is_correct: bool
 
 # --- API ROUTES ---
 
@@ -58,6 +63,28 @@ def save_score(data: ScoreData):
     db.commit()
     db.close()
     return {"message": "Score saved successfully!"}
+
+@app.post("/api/save-attempt")
+def save_attempt(data: AttemptData):
+    db = SessionLocal()
+    player = db.query(Player).filter(Player.nickname == data.nickname).first()
+    
+    # If the player doesn't exist yet, create them so we can track their attempts
+    if not player:
+        player = Player(nickname=data.nickname, xp=0)
+        db.add(player)
+        db.commit()
+        db.refresh(player)
+        
+    new_attempt = Attempt(
+        player_id=player.id,
+        question_id=data.question_id,
+        is_correct=1 if data.is_correct else 0
+    )
+    db.add(new_attempt)
+    db.commit()
+    db.close()
+    return {"message": "Attempt saved to Memory Vault"}
 
 @app.get("/api/player/{nickname}")
 def get_player(nickname: str):
@@ -115,5 +142,5 @@ def get_leaderboard():
     
     return {"leaderboard": leaderboard_data}
 
-# --- STATIC FILES ---
+# --- STATIC FILES (Must be the VERY LAST line) ---
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
