@@ -16,6 +16,8 @@
             height: 100vh;
             margin: 0;
             text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
         }
         h1 {
             color: #C9A84C; /* Gold */
@@ -38,6 +40,8 @@
             cursor: pointer;
             font-weight: bold;
             transition: background-color 0.3s ease;
+            width: 100%;
+            max-width: 300px;
         }
         .start-button:hover {
             background-color: #C9A84C; /* Gold on hover */
@@ -54,6 +58,13 @@
         .leaderboard-link:hover {
             color: #C9A84C;
             opacity: 1;
+        }
+
+        /* MOBILE RESPONSIVENESS */
+        @media (max-width: 600px) {
+            h1 { font-size: 2.5rem; }
+            p { font-size: 1rem; }
+            .start-button { padding: 12px 20px; font-size: 1rem; }
         }
     </style>
 </head>

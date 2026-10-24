@@ -35,7 +35,11 @@ function showQuestion() {
         button.style.padding = '10px 20px';
         button.style.fontSize = '1.1rem';
         button.style.cursor = 'pointer';
-        button.style.width = '300px';
+        
+        // --- MOBILE FIX HERE ---
+        button.style.width = '100%';
+        button.style.maxWidth = '300px';
+        // -----------------------
         
         button.onclick = () => checkAnswer(option, button);
         optionsContainer.appendChild(button);
@@ -45,7 +49,7 @@ function showQuestion() {
 function checkAnswer(selectedOption, clickedButton) {
     const question = currentQuestions[currentQuestionIndex];
     
-    // THIS IS THE FIX: This finds the first A, B, C, or D in the string, 
+    // This finds the first A, B, C, or D in the string, 
     // ignoring any quotes or spaces.
     const match = selectedOption.match(/[A-D]/);
     const selectedLetter = match ? match[0] : "";
