@@ -1,4 +1,5 @@
 # server.py
+import random
 import ast
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -16,22 +17,25 @@ class SpendData(BaseModel):
     nickname: str
     amount: int
 
-# --- API ROUTES (Must be above app.mount) ---
+# --- API ROUTES ---
 
 @app.get("/api/questions")
 def get_questions():
-    # Fetch questions from the database
     db = SessionLocal()
     questions = db.query(Question).all()
     db.close()
     
+    # Shuffle the questions so it's different every time
+    random.shuffle(questions)
+    
+    # Limit to 5 questions per game
+    questions = questions[:5] 
+    
     formatted_questions = []
     for q in questions:
         try:
-            # This safely turns the text "['A) Mars', 'B) Earth']" back into a real Python list
             parsed_options = ast.literal_eval(q.options)
-        except Exception:
-            # If there's an error, fallback to a simple split
+        except:
             parsed_options = q.options.split(", ")
             
         formatted_questions.append({
@@ -101,6 +105,20 @@ def get_buildings(nickname: str):
     buildings = db.query(Building).filter(Building.player_id == player.id).all()
     db.close()
     return {"buildings": [b.building_type for b in buildings]}
+
+# --- NEW LEADERBOARD ENDPOINT ---
+@app.get("/api/leaderboard")
+def get_leaderboard():
+    db = SessionLocal()
+    # Query all players, sort them by XP in descending order, and limit to the top 10
+    top_players = db.query(Player).order_by(Player.xp.desc()).limit(10).all()
+    db.close()
+    
+    leaderboard_data = [
+        {"nickname": p.nickname, "xp": p.xp} for p in top_players
+    ]
+    
+    return {"leaderboard": leaderboard_data}
 
 # --- STATIC FILES (Must be the VERY LAST line) ---
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
