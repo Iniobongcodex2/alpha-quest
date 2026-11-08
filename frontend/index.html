@@ -104,10 +104,10 @@
 
         /* --- MISSION BRIEFING MODAL --- */
         .modal-overlay {
-            display: none; /* Hidden by default */
+            display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(10, 30, 61, 0.95); /* Navy with high opacity */
+            background-color: rgba(10, 30, 61, 0.95);
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -214,6 +214,9 @@
         <!-- BOSS BATTLE BUTTON -->
         <button class="start-button" id="boss-btn" onclick="showMissionBriefing('All', 'boss')" style="background-color: #E53E3E; margin-top: 15px;">👹 Boss Battle (15 Questions)</button>
         
+        <!-- BRAIN RUSH BUTTON -->
+        <button class="start-button" id="rush-btn" onclick="showMissionBriefing('All', 'rush')" style="background-color: #9F7AEA; margin-top: 15px;">⚡ Brain Rush (Timed Mode)</button>
+        
         <div class="nav-links">
             <a href="/leaderboard.html" class="leaderboard-link" id="lb-link">View Leaderboard 🏆</a>
             <a href="/rewards.html" class="leaderboard-link" id="rewards-link">View Rewards Room 🏅</a>
@@ -221,6 +224,11 @@
         </div>
         
         <div id="game-screen" style="display: none; margin-top: 30px; width: 100%; max-width: 600px;">
+            <!-- TIMER DISPLAY -->
+            <div id="timer-container" style="display: none; margin-bottom: 15px;">
+                <span style="font-size: 1.5rem; font-weight: bold; color: #E53E3E;">⏱️ Time: <span id="time-left">15</span>s</span>
+            </div>
+            
             <p id="progress-text" style="color: #C9A84C; font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;"></p>
             <h2 id="question-text" style="color: #FFFFFF; font-size: 1.5rem;"></h2>
             <div id="options-container" style="display: flex; flex-direction: column; gap: 10px; align-items: center; margin-top: 20px;"></div>
