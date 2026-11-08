@@ -317,9 +317,10 @@
         </div>
     </div>
 
-    <!-- Inline script to update links, profile card, and daily bonus -->
+    <!-- Inline script to update links, profile card, daily bonus, and remember me -->
     <script>
         const nameInput = document.getElementById('nickname-input');
+        const avatarSelect = document.getElementById('avatar-select');
         const lbLink = document.getElementById('lb-link');
         const rewardsLink = document.getElementById('rewards-link');
         const vaultLink = document.getElementById('vault-link');
@@ -331,8 +332,31 @@
         const profileLevel = document.getElementById('profile-level');
         const profileXpBar = document.getElementById('profile-xp-bar');
 
+        // --- REMEMBER ME: LOAD SAVED DATA ---
+        const savedName = localStorage.getItem('aq_nickname');
+        const savedAvatar = localStorage.getItem('aq_avatar');
+        
+        if (savedAvatar) {
+            avatarSelect.value = savedAvatar;
+        }
+        if (savedName) {
+            nameInput.value = savedName;
+            // Trigger the input event so the profile card loads automatically
+            nameInput.dispatchEvent(new Event('input')); 
+        }
+
+        // --- REMEMBER ME: SAVE AVATAR ---
+        avatarSelect.addEventListener('change', (e) => {
+            localStorage.setItem('aq_avatar', e.target.value);
+        });
+
         nameInput.addEventListener('input', async () => {
             const name = nameInput.value.trim() || 'Explorer';
+            
+            // Save the name if it's long enough
+            if (name.length > 2) {
+                localStorage.setItem('aq_nickname', name);
+            }
             
             // Update links
             lbLink.href = `/leaderboard.html?nickname=${encodeURIComponent(name)}`;
