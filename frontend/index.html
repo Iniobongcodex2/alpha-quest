@@ -102,6 +102,40 @@
         .world-card.all-worlds { grid-column: span 2; background-color: #C9A84C; color: #0A1E3D; border-color: #FFFFFF; }
         .world-card.all-worlds:hover { background-color: #E2C26B; }
 
+        /* --- MISSION BRIEFING MODAL --- */
+        .modal-overlay {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(10, 30, 61, 0.95); /* Navy with high opacity */
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #1A4B8C;
+            border: 3px solid #C9A84C;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .modal-title { color: #C9A84C; font-size: 1.8rem; margin-bottom: 15px; }
+        .modal-story { color: #F4F6F9; font-size: 1.1rem; margin-bottom: 25px; line-height: 1.5; }
+        .modal-btn {
+            background-color: #C9A84C;
+            color: #0A1E3D;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+        .modal-btn:hover { background-color: #E2C26B; }
+
         /* --- GAME ANIMATIONS --- */
         @keyframes shake {
             0% { transform: translateX(0); }
@@ -146,39 +180,39 @@
             </select>
         </div>
 
-        <!-- NEW WORLD MAP (Replaces Dropdown) -->
+        <!-- WORLD MAP -->
         <p style="margin-bottom: 10px; font-weight: bold; font-size: 1rem;">Select a World to Explore:</p>
         <div class="world-map">
-            <div class="world-card" onclick="startGame('normal', 'Math World')">
+            <div class="world-card" onclick="showMissionBriefing('Math World', 'normal')">
                 <div class="icon">🔢</div>
                 <div class="name">Math World</div>
             </div>
-            <div class="world-card" onclick="startGame('normal', 'English Kingdom')">
+            <div class="world-card" onclick="showMissionBriefing('English Kingdom', 'normal')">
                 <div class="icon">📖</div>
                 <div class="name">English Kingdom</div>
             </div>
-            <div class="world-card" onclick="startGame('normal', 'Science Lab')">
+            <div class="world-card" onclick="showMissionBriefing('Science Lab', 'normal')">
                 <div class="icon">🔬</div>
                 <div class="name">Science Lab</div>
             </div>
-            <div class="world-card" onclick="startGame('normal', 'Discovery World')">
+            <div class="world-card" onclick="showMissionBriefing('Discovery World', 'normal')">
                 <div class="icon">🗺️</div>
                 <div class="name">Discovery World</div>
             </div>
-            <div class="world-card" onclick="startGame('normal', 'Logic Temple')">
+            <div class="world-card" onclick="showMissionBriefing('Logic Temple', 'normal')">
                 <div class="icon">🧩</div>
                 <div class="name">Logic Temple</div>
             </div>
-            <div class="world-card all-worlds" onclick="startGame('normal', 'All')">
+            <div class="world-card all-worlds" onclick="showMissionBriefing('All', 'normal')">
                 <div class="icon">🌍</div>
                 <div class="name">Mixed Worlds (Random)</div>
             </div>
         </div>
         
-        <button class="start-button" id="start-btn" onclick="startGame('normal', 'All')">Start Your Journey</button>
+        <button class="start-button" id="start-btn" onclick="showMissionBriefing('All', 'normal')">Start Your Journey</button>
         
         <!-- BOSS BATTLE BUTTON -->
-        <button class="start-button" id="boss-btn" onclick="startGame('boss', 'All')" style="background-color: #E53E3E; margin-top: 15px;">👹 Boss Battle (15 Questions)</button>
+        <button class="start-button" id="boss-btn" onclick="showMissionBriefing('All', 'boss')" style="background-color: #E53E3E; margin-top: 15px;">👹 Boss Battle (15 Questions)</button>
         
         <div class="nav-links">
             <a href="/leaderboard.html" class="leaderboard-link" id="lb-link">View Leaderboard 🏆</a>
@@ -187,13 +221,20 @@
         </div>
         
         <div id="game-screen" style="display: none; margin-top: 30px; width: 100%; max-width: 600px;">
-            <!-- PROGRESS TRACKER -->
             <p id="progress-text" style="color: #C9A84C; font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;"></p>
-            
             <h2 id="question-text" style="color: #FFFFFF; font-size: 1.5rem;"></h2>
             <div id="options-container" style="display: flex; flex-direction: column; gap: 10px; align-items: center; margin-top: 20px;"></div>
             <p id="feedback-text" style="margin-top: 20px; font-size: 1.2rem; font-weight: bold;"></p>
             <button id="next-btn" onclick="nextQuestion()" style="display: none; margin-top: 20px; padding: 10px 20px; background-color: #C9A84C; color: #0A1E3D; border: none; border-radius: 5px; font-size: 1.1rem; cursor: pointer; font-weight: bold;">Next Question</button>
+        </div>
+    </div>
+
+    <!-- MISSION BRIEFING MODAL -->
+    <div id="mission-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 id="modal-title" class="modal-title">Mission Title</h2>
+            <p id="modal-story" class="modal-story">Mission story goes here...</p>
+            <button id="modal-start-btn" class="modal-btn" onclick="beginQuiz()">Start Mission</button>
         </div>
     </div>
 
