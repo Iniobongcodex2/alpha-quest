@@ -12,6 +12,7 @@ class Player(Base):
     id = Column(Integer, primary_key=True, index=True)
     nickname = Column(String, index=True)
     xp = Column(Integer, default=0)
+    avatar = Column(String, default="🦊") # <-- NEW: Added avatar column
     buildings = relationship("Building", back_populates="owner")
 
 class Building(Base):
