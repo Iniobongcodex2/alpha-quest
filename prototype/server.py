@@ -16,7 +16,7 @@ class ScoreData(BaseModel):
 class SpendData(BaseModel):
     nickname: str
     amount: int
-    building_type: str # <-- NEW: Added to accept specific buildings
+    building_type: str 
 
 class AttemptData(BaseModel):
     nickname: str
@@ -136,7 +136,6 @@ def spend_xp(data: SpendData):
     
     player.xp -= data.amount
     
-    # NEW: Use the building_type sent from the frontend!
     new_building = Building(player_id=player.id, building_type=data.building_type)
     db.add(new_building)
     
@@ -170,7 +169,6 @@ def get_leaderboard():
     
     return {"leaderboard": leaderboard_data}
 
-# --- REWARDS ROOM (BADGES) API ---
 @app.get("/api/badges/{nickname}")
 def get_badges(nickname: str):
     db = SessionLocal()
@@ -182,7 +180,6 @@ def get_badges(nickname: str):
         
     earned_badges = []
     
-    # Badge Logic based on XP
     if player.xp >= 100:
         earned_badges.append({"name": "Bronze Explorer", "icon": "🥉", "description": "Earned 100 XP"})
     if player.xp >= 500:
@@ -190,13 +187,26 @@ def get_badges(nickname: str):
     if player.xp >= 1000:
         earned_badges.append({"name": "Gold Master", "icon": "🥇", "description": "Earned 1000 XP"})
         
-    # Badge Logic based on Buildings
     buildings = db.query(Building).filter(Building.player_id == player.id).all()
     if len(buildings) > 0:
         earned_badges.append({"name": "Builder", "icon": "🏗️", "description": "Built your first structure"})
 
     db.close()
     return {"badges": earned_badges}
+
+# --- TEACHER STUDIO API ---
+@app.get("/api/teacher/students")
+def get_all_students():
+    db = SessionLocal()
+    # Get all players, sorted by highest XP first
+    players = db.query(Player).order_by(Player.xp.desc()).all()
+    db.close()
+    
+    student_list = [
+        {"id": p.id, "nickname": p.nickname, "xp": p.xp} for p in players
+    ]
+    
+    return {"students": student_list}
 
 # --- STATIC FILES (Must be the VERY LAST line) ---
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
