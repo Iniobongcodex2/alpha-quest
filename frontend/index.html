@@ -106,7 +106,35 @@
         <input type="text" id="nickname-input" placeholder="Enter your nickname" style="padding: 10px; font-size: 1rem; border-radius: 5px; border: none; margin-bottom: 15px; text-align: center; width: 250px;">
         <br>
         
-        <button class="start-button" id="start-btn" onclick="startGame()">Start Your Journey</button>
+        <!-- AVATAR SELECTOR -->
+        <div style="margin-bottom: 15px;">
+            <label style="font-size: 1.1rem; margin-right: 10px;">Avatar:</label>
+            <select id="avatar-select" style="padding: 10px; font-size: 1.5rem; border-radius: 5px; border: none; cursor: pointer;">
+                <option value="🦊">🦊 Fox</option>
+                <option value="🦁">🦁 Lion</option>
+                <option value="🦉">🦉 Owl</option>
+                <option value="🐼">🐼 Panda</option>
+                <option value="🦅">🦅 Eagle</option>
+            </select>
+        </div>
+
+        <!-- WORLD SELECTOR -->
+        <div style="margin-bottom: 20px;">
+            <label style="font-size: 1.1rem; margin-right: 10px;">World:</label>
+            <select id="subject-select" style="padding: 10px; font-size: 1rem; border-radius: 5px; border: none; cursor: pointer; width: 200px;">
+                <option value="All">🌍 All Worlds</option>
+                <option value="Math World">🔢 Math World</option>
+                <option value="English Kingdom">📖 English Kingdom</option>
+                <option value="Science Lab">🔬 Science Lab</option>
+                <option value="Discovery World">🗺️ Discovery World</option>
+                <option value="Logic Temple">🧩 Logic Temple</option>
+            </select>
+        </div>
+        
+        <button class="start-button" id="start-btn" onclick="startGame('normal')">Start Your Journey</button>
+        
+        <!-- BOSS BATTLE BUTTON -->
+        <button class="start-button" id="boss-btn" onclick="startGame('boss')" style="background-color: #E53E3E; margin-top: 15px;">👹 Boss Battle (15 Questions)</button>
         
         <div class="nav-links">
             <a href="/leaderboard.html" class="leaderboard-link" id="lb-link">View Leaderboard 🏆</a>
@@ -115,6 +143,9 @@
         </div>
         
         <div id="game-screen" style="display: none; margin-top: 30px; width: 100%; max-width: 600px;">
+            <!-- PROGRESS TRACKER -->
+            <p id="progress-text" style="color: #C9A84C; font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;"></p>
+            
             <h2 id="question-text" style="color: #FFFFFF; font-size: 1.5rem;"></h2>
             <div id="options-container" style="display: flex; flex-direction: column; gap: 10px; align-items: center; margin-top: 20px;"></div>
             <p id="feedback-text" style="margin-top: 20px; font-size: 1.2rem; font-weight: bold;"></p>
