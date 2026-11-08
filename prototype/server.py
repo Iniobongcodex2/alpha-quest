@@ -1,6 +1,8 @@
 # server.py
 import random
-import ast
+import astimport csv
+import io
+from fastapi.responses import StreamingResponse
 from datetime import date
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -316,6 +318,33 @@ def get_vault(nickname: str):
                 
     db.close()
     return {"vault": vault_data}
+@app.get("/api/teacher/export")
+def export_students_csv():
+    db = SessionLocal()
+    players = db.query(Player).order_by(Player.xp.desc()).all()
+    
+    # Create an in-memory string buffer to hold the CSV data
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Write the header row
+    writer.writerow(["Student ID", "Nickname", "Total XP", "Avatar"])
+    
+    # Write the data rows
+    for p in players:
+        writer.writerow([p.id, p.nickname, p.xp, p.avatar])
+        
+    db.close()
+    
+    # Move the cursor to the beginning of the file
+    output.seek(0)
+    
+    # Return the file as a downloadable attachment
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=alpha_quest_roster.csv"}
+    )
 
 # --- STATIC FILES (Must be the VERY LAST line) ---
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")

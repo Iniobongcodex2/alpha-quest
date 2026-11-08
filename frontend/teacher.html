@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Studio - Alpha Quest</title>
+    <style>
+        body {
+            background-color: #F4F6F9; /* Light Gray for Teacher area */
+            color: #2D3748; /* Dark Gray text */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 40px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #0A1E3D;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        h1 { color: #0A1E3D; margin: 0; }
+        .logout-btn {
+            background-color: #0A1E3D;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        /* --- NEW: Export Button Styles --- */
+        .export-btn {
+            background-color: #48BB78; /* Green */
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            display: inline-block;
+        }
+        .export-btn:hover { background-color: #38A169; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        th {
+            background-color: #1A4B8C;
+            color: white;
+            font-weight: 600;
+        }
+        tr:hover { background-color: #F8FAFC; }
+        .xp-badge {
+            background-color: #C9A84C;
+            color: #0A1E3D;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        /* --- Student Report Styles --- */
+        #report-section {
+            display: none; 
+            margin-top: 40px; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        #report-title { color: #0A1E3D; margin-top: 0; }
+        #report-list { list-style-type: none; padding: 0; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>👨‍🏫 Teacher Studio</h1>
+        <a href="/" class="logout-btn">Exit to Game</a>
+    </div>
+
+    <!-- NEW: Flex container for the title and the download button -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h2 style="margin: 0;">Classroom Roster</h2>
+        <a href="/api/teacher/export" class="export-btn" download>📥 Download Roster (CSV)</a>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Student ID</th>
+                <th>Nickname</th>
+                <th>Total XP</th>
+            </tr>
+        </thead>
+        <tbody id="student-list">
+            <tr><td colspan="3">Loading students...</td></tr>
+        </tbody>
+    </table>
+
+    <!-- Student Report Section -->
+    <div id="report-section">
+        <h3 id="report-title">Report</h3>
+        <ul id="report-list"></ul>
+    </div>
+
+    <script src="teacher.js"></script>
+</body>
+</html>
