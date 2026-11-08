@@ -22,8 +22,8 @@ class SpendData(BaseModel):
     nickname: str
     amount: int
     building_type: str 
-    position_x: int = 0 # <-- NEW
-    position_y: int = 0 # <-- NEW
+    position_x: int = 0 
+    position_y: int = 0 
 
 class AttemptData(BaseModel):
     nickname: str
@@ -36,7 +36,6 @@ class AttemptData(BaseModel):
 def get_questions(nickname: str = None, subject: str = None, mode: str = None):
     db = SessionLocal()
     
-    # 1. Boss Battle and Brain Rush Logic
     question_limit = 10
     if mode == "boss":
         question_limit = 15
@@ -45,17 +44,14 @@ def get_questions(nickname: str = None, subject: str = None, mode: str = None):
         question_limit = 10
         subject = "All"
         
-    # 2. Filter by selected world/subject
     if subject and subject != "All":
         all_questions = db.query(Question).filter(Question.subject == subject).all()
     else:
         all_questions = db.query(Question).all()
     
-    # 3. Memory Vault Logic
     if nickname:
         player = db.query(Player).filter(Player.nickname == nickname).first()
         if player:
-            # Find questions this player got wrong
             wrong_attempts = db.query(Attempt).filter(
                 Attempt.player_id == player.id, 
                 Attempt.is_correct == 0
@@ -63,14 +59,12 @@ def get_questions(nickname: str = None, subject: str = None, mode: str = None):
             
             wrong_q_ids = list(set([a.question_id for a in wrong_attempts]))
             
-            # Separate and shuffle
             review_questions = [q for q in all_questions if q.id in wrong_q_ids]
             other_questions = [q for q in all_questions if q.id not in wrong_q_ids]
             
             random.shuffle(review_questions)
             random.shuffle(other_questions)
             
-            # Put wrong answers first, then fill with others
             questions = review_questions + other_questions
             questions = questions[:question_limit] 
         else:
@@ -82,7 +76,6 @@ def get_questions(nickname: str = None, subject: str = None, mode: str = None):
 
     db.close()
     
-    # 4. Format for frontend
     formatted_questions = []
     for q in questions:
         try:
@@ -160,7 +153,6 @@ def spend_xp(data: SpendData):
     
     player.xp -= data.amount
     
-    # SAVE COORDINATES
     new_building = Building(
         player_id=player.id, 
         building_type=data.building_type,
@@ -186,7 +178,6 @@ def get_buildings(nickname: str):
     buildings = db.query(Building).filter(Building.player_id == player.id).all()
     db.close()
     
-    # RETURN COORDINATES
     return {"buildings": [
         {"type": b.building_type, "x": b.position_x, "y": b.position_y} for b in buildings
     ]}
@@ -214,6 +205,7 @@ def get_badges(nickname: str):
         
     earned_badges = []
     
+    # 1. XP Milestone Badges
     if player.xp >= 100:
         earned_badges.append({"name": "Bronze Explorer", "icon": "🥉", "description": "Earned 100 XP"})
     if player.xp >= 500:
@@ -223,9 +215,34 @@ def get_badges(nickname: str):
     if player.xp >= 400:
         earned_badges.append({"name": "Boss Slayer", "icon": "👹", "description": "Proved your mastery in a Boss Battle"})
         
+    # 2. Builder Badge
     buildings = db.query(Building).filter(Building.player_id == player.id).all()
     if len(buildings) > 0:
         earned_badges.append({"name": "Builder", "icon": "🏗️", "description": "Built your first structure"})
+
+    # 3. Subject Mastery Badges
+    correct_attempts = db.query(Attempt).filter(
+        Attempt.player_id == player.id,
+        Attempt.is_correct == 1
+    ).all()
+    
+    subject_counts = {"Math World": 0, "English Kingdom": 0, "Science Lab": 0, "Logic Temple": 0, "Discovery World": 0}
+    
+    for attempt in correct_attempts:
+        question = db.query(Question).filter(Question.id == attempt.question_id).first()
+        if question and question.subject in subject_counts:
+            subject_counts[question.subject] += 1
+            
+    if subject_counts["Math World"] >= 5:
+        earned_badges.append({"name": "Math Apprentice", "icon": "🧮", "description": "Answered 5 Math questions correctly"})
+    if subject_counts["English Kingdom"] >= 5:
+        earned_badges.append({"name": "Word Wizard", "icon": "📖", "description": "Answered 5 English questions correctly"})
+    if subject_counts["Science Lab"] >= 5:
+        earned_badges.append({"name": "Science Explorer", "icon": "🔬", "description": "Answered 5 Science questions correctly"})
+    if subject_counts["Logic Temple"] >= 5:
+        earned_badges.append({"name": "Logic Master", "icon": "🧠", "description": "Answered 5 Logic questions correctly"})
+    if subject_counts["Discovery World"] >= 5:
+        earned_badges.append({"name": "Globe Trotter", "icon": "🌍", "description": "Answered 5 Discovery questions correctly"})
 
     db.close()
     return {"badges": earned_badges}
