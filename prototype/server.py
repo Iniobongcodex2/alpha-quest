@@ -32,7 +32,7 @@ def get_questions(nickname: str = None):
     if nickname:
         player = db.query(Player).filter(Player.nickname == nickname).first()
         if player:
-            # MEMORY VAULT LOGIC: Find questions this player previously got wrong
+            # Find questions this player got wrong
             wrong_attempts = db.query(Attempt).filter(
                 Attempt.player_id == player.id, 
                 Attempt.is_correct == 0
@@ -40,22 +40,20 @@ def get_questions(nickname: str = None):
             
             wrong_q_ids = list(set([a.question_id for a in wrong_attempts]))
             
-            # Separate into "needs review" and "other"
+            # Separate and shuffle
             review_questions = [q for q in all_questions if q.id in wrong_q_ids]
             other_questions = [q for q in all_questions if q.id not in wrong_q_ids]
             
             random.shuffle(review_questions)
             random.shuffle(other_questions)
             
-            # Priority: Put the ones they got wrong first!
+            # Memory Vault puts wrong answers first!
             questions = review_questions + other_questions
             questions = questions[:10] 
         else:
-            # New player, just shuffle and pick 10
             random.shuffle(all_questions)
             questions = all_questions[:10]
     else:
-        # No nickname provided, just shuffle
         random.shuffle(all_questions)
         questions = all_questions[:10]
 
@@ -111,7 +109,7 @@ def save_attempt(data: AttemptData):
     db.add(new_attempt)
     db.commit()
     db.close()
-    return {"message": "Attempt saved to Memory Vault"}
+    return {"message": "Attempt saved"}
 
 @app.get("/api/player/{nickname}")
 def get_player(nickname: str):
@@ -169,5 +167,5 @@ def get_leaderboard():
     
     return {"leaderboard": leaderboard_data}
 
-# --- STATIC FILES (Must be the VERY LAST line) ---
+# --- STATIC FILES ---
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
