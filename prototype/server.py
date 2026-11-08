@@ -224,5 +224,39 @@ def get_all_students():
     
     return {"students": student_list}
 
+# NEW: Teacher Report API
+@app.get("/api/teacher/report/{nickname}")
+def get_student_report(nickname: str):
+    db = SessionLocal()
+    player = db.query(Player).filter(Player.nickname == nickname).first()
+    
+    if not player:
+        db.close()
+        raise HTTPException(status_code=404, detail="Student not found")
+        
+    # Get all attempts for this student where they got it wrong
+    wrong_attempts = db.query(Attempt).filter(
+        Attempt.player_id == player.id,
+        Attempt.is_correct == 0
+    ).all()
+    
+    # Get the actual question details for the wrong attempts
+    report_data = []
+    seen_questions = set() # To prevent duplicates
+    
+    for attempt in wrong_attempts:
+        if attempt.question_id not in seen_questions:
+            question = db.query(Question).filter(Question.id == attempt.question_id).first()
+            if question:
+                report_data.append({
+                    "subject": question.subject,
+                    "prompt": question.prompt,
+                    "correct_answer": question.correct_answer
+                })
+                seen_questions.add(attempt.question_id)
+                
+    db.close()
+    return {"report": report_data}
+
 # --- STATIC FILES (Must be the VERY LAST line) ---
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
