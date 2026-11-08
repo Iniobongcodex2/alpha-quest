@@ -4,7 +4,7 @@ let currentQuestions = [];
 let currentQuestionIndex = 0;
 let score = 0;
 let playerName = "Explorer"; 
-let isBossBattle = false; // <-- NEW: Tracks if they are in a boss battle
+let isBossBattle = false; 
 
 // --- AUDIO SYNTHESIZER ---
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -38,20 +38,18 @@ function playSound(type) {
 }
 
 // --- GAME LOGIC ---
-async function startGame(mode = "normal") {
+// UPDATED: Now accepts 'subject' directly from the World Map card click
+async function startGame(mode = "normal", subject = "All") {
     isBossBattle = (mode === "boss");
     
     const inputField = document.getElementById('nickname-input');
     const avatarField = document.getElementById('avatar-select');
-    const subjectField = document.getElementById('subject-select');
     
     playerName = inputField ? inputField.value.trim() : "Explorer";
     if (!playerName) playerName = "Explorer";
-    
-    const selectedSubject = subjectField ? subjectField.value : "All";
 
-    // Send the mode (normal or boss) to the backend
-    const response = await fetch(`/api/questions?nickname=${encodeURIComponent(playerName)}&subject=${encodeURIComponent(selectedSubject)}&mode=${mode}`);
+    // Send the mode and subject to the backend
+    const response = await fetch(`/api/questions?nickname=${encodeURIComponent(playerName)}&subject=${encodeURIComponent(subject)}&mode=${mode}`);
     const data = await response.json();
     
     if (data.questions.length === 0) {
@@ -68,7 +66,10 @@ async function startGame(mode = "normal") {
     document.getElementById('boss-btn').style.display = 'none';
     if(inputField) inputField.style.display = 'none'; 
     if(avatarField) avatarField.parentElement.style.display = 'none'; 
-    if(subjectField) subjectField.parentElement.style.display = 'none'; 
+    
+    // Hide the World Map
+    const worldMap = document.querySelector('.world-map');
+    if (worldMap) worldMap.style.display = 'none';
     
     document.getElementById('game-screen').style.display = 'block';
 

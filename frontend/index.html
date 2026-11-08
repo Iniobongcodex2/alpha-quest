@@ -74,6 +74,34 @@
         }
         .teacher-link:hover { opacity: 0.9; }
 
+        /* --- WORLD MAP STYLES --- */
+        .world-map {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto 20px auto;
+        }
+        .world-card {
+            background-color: #1A4B8C;
+            border: 2px solid #C9A84C;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            text-align: center;
+        }
+        .world-card:hover {
+            transform: scale(1.05);
+            background-color: #2D3748;
+        }
+        .world-card .icon { font-size: 2rem; margin-bottom: 5px; }
+        .world-card .name { font-size: 0.9rem; font-weight: bold; }
+        
+        /* Make the last card span the full width */
+        .world-card.all-worlds { grid-column: span 2; background-color: #C9A84C; color: #0A1E3D; border-color: #FFFFFF; }
+        .world-card.all-worlds:hover { background-color: #E2C26B; }
+
         /* --- GAME ANIMATIONS --- */
         @keyframes shake {
             0% { transform: translateX(0); }
@@ -118,23 +146,39 @@
             </select>
         </div>
 
-        <!-- WORLD SELECTOR -->
-        <div style="margin-bottom: 20px;">
-            <label style="font-size: 1.1rem; margin-right: 10px;">World:</label>
-            <select id="subject-select" style="padding: 10px; font-size: 1rem; border-radius: 5px; border: none; cursor: pointer; width: 200px;">
-                <option value="All">🌍 All Worlds</option>
-                <option value="Math World">🔢 Math World</option>
-                <option value="English Kingdom">📖 English Kingdom</option>
-                <option value="Science Lab">🔬 Science Lab</option>
-                <option value="Discovery World">🗺️ Discovery World</option>
-                <option value="Logic Temple">🧩 Logic Temple</option>
-            </select>
+        <!-- NEW WORLD MAP (Replaces Dropdown) -->
+        <p style="margin-bottom: 10px; font-weight: bold; font-size: 1rem;">Select a World to Explore:</p>
+        <div class="world-map">
+            <div class="world-card" onclick="startGame('normal', 'Math World')">
+                <div class="icon">🔢</div>
+                <div class="name">Math World</div>
+            </div>
+            <div class="world-card" onclick="startGame('normal', 'English Kingdom')">
+                <div class="icon">📖</div>
+                <div class="name">English Kingdom</div>
+            </div>
+            <div class="world-card" onclick="startGame('normal', 'Science Lab')">
+                <div class="icon">🔬</div>
+                <div class="name">Science Lab</div>
+            </div>
+            <div class="world-card" onclick="startGame('normal', 'Discovery World')">
+                <div class="icon">🗺️</div>
+                <div class="name">Discovery World</div>
+            </div>
+            <div class="world-card" onclick="startGame('normal', 'Logic Temple')">
+                <div class="icon">🧩</div>
+                <div class="name">Logic Temple</div>
+            </div>
+            <div class="world-card all-worlds" onclick="startGame('normal', 'All')">
+                <div class="icon">🌍</div>
+                <div class="name">Mixed Worlds (Random)</div>
+            </div>
         </div>
         
-        <button class="start-button" id="start-btn" onclick="startGame('normal')">Start Your Journey</button>
+        <button class="start-button" id="start-btn" onclick="startGame('normal', 'All')">Start Your Journey</button>
         
         <!-- BOSS BATTLE BUTTON -->
-        <button class="start-button" id="boss-btn" onclick="startGame('boss')" style="background-color: #E53E3E; margin-top: 15px;">👹 Boss Battle (15 Questions)</button>
+        <button class="start-button" id="boss-btn" onclick="startGame('boss', 'All')" style="background-color: #E53E3E; margin-top: 15px;">👹 Boss Battle (15 Questions)</button>
         
         <div class="nav-links">
             <a href="/leaderboard.html" class="leaderboard-link" id="lb-link">View Leaderboard 🏆</a>
