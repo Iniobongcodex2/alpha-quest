@@ -12,6 +12,51 @@
             margin: 0;
             padding: 40px;
         }
+        
+        /* --- LOGIN SCREEN STYLES --- */
+        #login-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 80vh;
+            text-align: center;
+        }
+        .login-box {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            max-width: 300px;
+            width: 100%;
+        }
+        .login-box h2 { color: #0A1E3D; margin-top: 0; }
+        .login-input {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 1.2rem;
+            text-align: center;
+            letter-spacing: 5px;
+        }
+        .login-btn {
+            background-color: #1A4B8C;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .login-btn:hover { background-color: #0A1E3D; }
+        .error-text { color: #E53E3E; font-size: 0.9rem; margin-top: 10px; display: none; }
+
+        /* --- DASHBOARD STYLES --- */
         .header {
             display: flex;
             justify-content: space-between;
@@ -30,7 +75,7 @@
             font-weight: bold;
         }
         
-        /* --- NEW: Export Button Styles --- */
+        /* --- EXPORT BUTTON STYLES --- */
         .export-btn {
             background-color: #48BB78; /* Green */
             color: white;
@@ -85,34 +130,49 @@
 </head>
 <body>
 
-    <div class="header">
-        <h1>👨‍🏫 Teacher Studio</h1>
-        <a href="/" class="logout-btn">Exit to Game</a>
+    <!-- NEW: TEACHER LOGIN SCREEN -->
+    <div id="login-screen">
+        <div class="login-box">
+            <h2>🔒 Teacher Access</h2>
+            <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px;">Enter the 4-digit PIN to access the dashboard.</p>
+            <input type="password" id="teacher-pin" class="login-input" placeholder="••••" maxlength="4" onkeypress="if(event.key === 'Enter') checkPin()">
+            <button class="login-btn" onclick="checkPin()">Enter Studio</button>
+            <p id="login-error" class="error-text">Incorrect PIN. Try again.</p>
+        </div>
     </div>
 
-    <!-- NEW: Flex container for the title and the download button -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <h2 style="margin: 0;">Classroom Roster</h2>
-        <a href="/api/teacher/export" class="export-btn" download>📥 Download Roster (CSV)</a>
-    </div>
-    
-    <table>
-        <thead>
-            <tr>
-                <th>Student ID</th>
-                <th>Nickname</th>
-                <th>Total XP</th>
-            </tr>
-        </thead>
-        <tbody id="student-list">
-            <tr><td colspan="3">Loading students...</td></tr>
-        </tbody>
-    </table>
+    <!-- DASHBOARD SCREEN (Hidden until PIN is entered) -->
+    <div id="dashboard-screen" style="display: none;">
+        
+        <div class="header">
+            <h1>👨‍🏫 Teacher Studio</h1>
+            <a href="/" class="logout-btn">Exit to Game</a>
+        </div>
 
-    <!-- Student Report Section -->
-    <div id="report-section">
-        <h3 id="report-title">Report</h3>
-        <ul id="report-list"></ul>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2 style="margin: 0;">Classroom Roster</h2>
+            <a href="/api/teacher/export" class="export-btn" download>📥 Download Roster (CSV)</a>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Nickname</th>
+                    <th>Total XP</th>
+                </tr>
+            </thead>
+            <tbody id="student-list">
+                <tr><td colspan="3">Loading students...</td></tr>
+            </tbody>
+        </table>
+
+        <!-- Student Report Section -->
+        <div id="report-section">
+            <h3 id="report-title">Report</h3>
+            <ul id="report-list"></ul>
+        </div>
+
     </div>
 
     <script src="teacher.js"></script>
