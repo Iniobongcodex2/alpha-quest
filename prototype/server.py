@@ -30,6 +30,11 @@ class AttemptData(BaseModel):
     question_id: int
     is_correct: bool
 
+class BuyAvatarData(BaseModel): # <-- NEW MODEL
+    nickname: str
+    avatar: str
+    cost: int
+
 # --- API ROUTES ---
 
 @app.get("/api/questions")
@@ -199,7 +204,6 @@ def get_badges(nickname: str):
     db = SessionLocal()
     player = db.query(Player).filter(Player.nickname == nickname).first()
     
-    # Master list of all badges
     all_badges = [
         {"name": "Bronze Explorer", "icon": "🥉", "description": "Earned 100 XP", "earned": False},
         {"name": "Silver Scholar", "icon": "🥈", "description": "Earned 500 XP", "earned": False},
@@ -246,7 +250,6 @@ def get_badges(nickname: str):
 
     db.close()
     
-    # Mark each badge as earned or locked
     for badge in all_badges:
         badge["earned"] = badge["name"] in earned_names
         
@@ -374,6 +377,29 @@ def get_vault(nickname: str):
                 
     db.close()
     return {"vault": vault_data}
+
+# --- NEW: AVATAR SHOP API ---
+@app.post("/api/buy-avatar")
+def buy_avatar(data: BuyAvatarData):
+    db = SessionLocal()
+    player = db.query(Player).filter(Player.nickname == data.nickname).first()
+    
+    if not player:
+        db.close()
+        raise HTTPException(status_code=404, detail="Player not found")
+        
+    if player.xp < data.cost:
+        db.close()
+        raise HTTPException(status_code=400, detail="Not enough XP to buy this avatar")
+        
+    player.xp -= data.cost
+    player.avatar = data.avatar
+    
+    db.commit()
+    new_xp = player.xp
+    db.close()
+    
+    return {"message": "Avatar purchased successfully!", "new_xp": new_xp}
 
 # --- STATIC FILES (Must be the VERY LAST line) ---
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
