@@ -281,5 +281,41 @@ def check_daily_bonus(nickname: str):
         db.close()
         return {"status": "already_claimed", "message": "Come back tomorrow!", "xp_earned": 0}
 
+# --- NEW: MEMORY VAULT DASHBOARD API ---
+@app.get("/api/vault/{nickname}")
+def get_vault(nickname: str):
+    db = SessionLocal()
+    player = db.query(Player).filter(Player.nickname == nickname).first()
+    
+    if not player:
+        db.close()
+        raise HTTPException(status_code=404, detail="Player not found")
+        
+    # Get all wrong attempts for this player
+    wrong_attempts = db.query(Attempt).filter(
+        Attempt.player_id == player.id, 
+        Attempt.is_correct == 0
+    ).all()
+    
+    # Get the actual questions, avoiding duplicates
+    vault_data = []
+    seen_questions = set()
+    
+    for attempt in wrong_attempts:
+        if attempt.question_id not in seen_questions:
+            question = db.query(Question).filter(Question.id == attempt.question_id).first()
+            if question:
+                vault_data.append({
+                    "id": question.id,
+                    "subject": question.subject,
+                    "prompt": question.prompt,
+                    "correct_answer": question.correct_answer,
+                    "explanation": question.explanation
+                })
+                seen_questions.add(question.id)
+                
+    db.close()
+    return {"vault": vault_data}
+
 # --- STATIC FILES (Must be the VERY LAST line) ---
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
