@@ -349,13 +349,21 @@
                         // Show daily bonus
                         dailyBtn.style.display = 'block';
                         
-                        // Update Profile Card
+                        // --- UPDATE PROFILE CARD WITH ACCESSORIES ---
                         profileName.innerText = playerData.nickname;
-                        profileAvatar.innerText = playerData.avatar || '🦊';
                         
                         const xp = playerData.xp;
                         const level = Math.floor(xp / 100) + 1;
                         profileLevel.innerText = `Level ${level}`;
+                        
+                        // Calculate Accessory based on Level
+                        let accessory = "";
+                        if (level >= 10) accessory = "🧙";
+                        else if (level >= 5) accessory = "👑";
+                        else if (level >= 3) accessory = "🕶️";
+                        else if (level >= 2) accessory = "🧢";
+                        
+                        profileAvatar.innerText = (playerData.avatar || '🦊') + accessory;
                         
                         const xpIntoLevel = xp % 100;
                         profileXpBar.style.width = `${xpIntoLevel}%`;
