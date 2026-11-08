@@ -21,6 +21,55 @@
         "explanation": "There are 6 ways to roll a 7 out of 36 possible outcomes (6/36 = 1/6)."
     },
     {
+        "subject": "Math World",
+        "prompt": "What is the next number in the sequence: 2, 6, 12, 20, 30, __?",
+        "options": "['A) 36', 'B) 40', 'C) 42', 'D) 50']",
+        "correct_answer": "C",
+        "explanation": "The differences are 4, 6, 8, 10. The next difference is 12. 30 + 12 = 42."
+    },
+    {
+        "subject": "Math World",
+        "prompt": "If a car travels at 60 miles per hour, how far will it travel in 45 minutes?",
+        "options": "['A) 30 miles', 'B) 45 miles', 'C) 50 miles', 'D) 60 miles']",
+        "correct_answer": "B",
+        "explanation": "45 minutes is 3/4 of an hour. 60 * (3/4) = 45."
+    },
+    {
+        "subject": "Math World",
+        "prompt": "What is 15% of 200?",
+        "options": "['A) 15', 'B) 20', 'C) 25', 'D) 30']",
+        "correct_answer": "D",
+        "explanation": "10% of 200 is 20. 5% is 10. 20 + 10 = 30."
+    },
+    {
+        "subject": "Math World",
+        "prompt": "Which of these numbers is a prime number?",
+        "options": "['A) 21', 'B) 27', 'C) 31', 'D) 33']",
+        "correct_answer": "C",
+        "explanation": "31 is only divisible by 1 and itself."
+    },
+    {
+        "subject": "Math World",
+        "prompt": "If a square has an area of 64 square inches, what is the length of one side?",
+        "options": "['A) 6 inches', 'B) 8 inches', 'C) 12 inches', 'D) 16 inches']",
+        "correct_answer": "B",
+        "explanation": "The square root of 64 is 8."
+    },
+    {
+        "subject": "Math World",
+        "prompt": "What is the value of 2³ + 4²?",
+        "options": "['A) 16', 'B) 20', 'C) 24', 'D) 32']",
+        "correct_answer": "C",
+        "explanation": "2³ is 8. 4² is 16. 8 + 16 = 24."
+    },
+    {
+        "subject": "Math World",
+        "prompt": "What is the perimeter of a rectangle with a length of 10cm and a width of 5cm?",
+        "options": "['A) 15cm', 'B) 30cm', 'C) 50cm', 'D) 100cm']",
+        "correct_answer": "B",
+        "explanation": "Perimeter = 2(length + width) = 2(10 + 5) = 30."
+    },
+    {
         "subject": "English Kingdom",
         "prompt": "Identify the underlined clause (or phrase) in meaning: 'Because it was raining, we stayed inside.' What type of clause is 'Because it was raining'?",
         "options": "['A) Independent clause', 'B) Dependent (subordinate) clause', 'C) Prepositional phrase', 'D) Gerund phrase']",
@@ -42,6 +91,55 @@
         "explanation": "It means to face a difficult or unpleasant situation with courage."
     },
     {
+        "subject": "English Kingdom",
+        "prompt": "Which word is an antonym for 'obsolete'?",
+        "options": "['A) Outdated', 'B) Ancient', 'C) Modern', 'D) Useless']",
+        "correct_answer": "C",
+        "explanation": "Obsolete means out of date. The opposite is modern."
+    },
+    {
+        "subject": "English Kingdom",
+        "prompt": "Identify the adverb in the sentence: 'The athlete ran remarkably fast.'",
+        "options": "['A) athlete', 'B) ran', 'C) remarkably', 'D) fast']",
+        "correct_answer": "C",
+        "explanation": "Remarakbly is an adverb that modifies the word 'fast'."
+    },
+    {
+        "subject": "English Kingdom",
+        "prompt": "What is the plural form of 'cactus'?",
+        "options": "['A) Cactuses', 'B) Cacti', 'C) Cactus', 'D) Cactis']",
+        "correct_answer": "B",
+        "explanation": "Cacti is the most accepted plural form in formal writing."
+    },
+    {
+        "subject": "English Kingdom",
+        "prompt": "Which of the following is a complex sentence?",
+        "options": "['A) I like pizza.', 'B) I like pizza and I like burgers.', 'C) Because I was hungry, I ate pizza.', 'D) I ate pizza.']",
+        "correct_answer": "C",
+        "explanation": "A complex sentence has one independent clause and at least one dependent clause."
+    },
+    {
+        "subject": "English Kingdom",
+        "prompt": "What does the prefix 'anti-' mean?",
+        "options": "['A) Before', 'B) Against', 'C) After', 'D) With']",
+        "correct_answer": "B",
+        "explanation": "Anti- means against or opposite of (e.g., antibiotic)."
+    },
+    {
+        "subject": "English Kingdom",
+        "prompt": "Select the correct spelling:",
+        "options": "['A) Receive', 'B) Recieve', 'C) Receve', 'D) Recieve']",
+        "correct_answer": "A",
+        "explanation": "Use 'i' before 'e' except after 'c'. Receive is correct."
+    },
+    {
+        "subject": "English Kingdom",
+        "prompt": "What is the subject of the following sentence? 'The tall boy kicked the ball.'",
+        "options": "['A) tall', 'B) boy', 'C) kicked', 'D) ball']",
+        "correct_answer": "B",
+        "explanation": "The subject is the person or thing doing the action. The boy kicked the ball."
+    },
+    {
         "subject": "Science Lab",
         "prompt": "Which of Newton's Laws states that 'for every action, there is an equal and opposite reaction'?",
         "options": "['A) First Law', 'B) Second Law', 'C) Third Law', 'D) Law of Gravitation']",
@@ -53,55 +151,146 @@
         "prompt": "What is the primary greenhouse gas emitted by human activities?",
         "options": "['A) Oxygen', 'B) Carbon Dioxide', 'C) Nitrogen', 'D) Helium']",
         "correct_answer": "B",
-        "explanation": "Carbon dioxide (CO2) is the primary greenhouse gas emitted through human activities like burning fossil fuels."
+        "explanation": "Carbon dioxide (CO2) is the primary greenhouse gas emitted through human activities."
     },
     {
         "subject": "Science Lab",
         "prompt": "Which part of the human brain controls balance and coordination?",
         "options": "['A) Cerebrum', 'B) Brainstem', 'C) Cerebellum', 'D) Hypothalamus']",
         "correct_answer": "C",
-        "explanation": "The cerebellum is located at the back of the brain and coordinates voluntary movements and balance."
+        "explanation": "The cerebellum coordinates voluntary movements and balance."
+    },
+    {
+        "subject": "Science Lab",
+        "prompt": "What is the chemical symbol for Gold?",
+        "options": "['A) Go', 'B) Gd', 'C) Au', 'D) Ag']",
+        "correct_answer": "C",
+        "explanation": "Au comes from the Latin word 'Aurum'."
+    },
+    {
+        "subject": "Science Lab",
+        "prompt": "What force keeps planets in orbit around the sun?",
+        "options": "['A) Magnetism', 'B) Gravity', 'C) Friction', 'D) Inertia']",
+        "correct_answer": "B",
+        "explanation": "Gravity is the force of attraction between masses."
+    },
+    {
+        "subject": "Science Lab",
+        "prompt": "What process do plants use to convert sunlight into food?",
+        "options": "['A) Respiration', 'B) Fermentation', 'C) Photosynthesis', 'D) Transpiration']",
+        "correct_answer": "C",
+        "explanation": "Photosynthesis uses chlorophyll and sunlight to create glucose."
+    },
+    {
+        "subject": "Science Lab",
+        "prompt": "Which planet in our solar system is known as the 'Red Planet'?",
+        "options": "['A) Venus', 'B) Jupiter', 'C) Mars', 'D) Saturn']",
+        "correct_answer": "C",
+        "explanation": "Mars is red due to iron oxide (rust) on its surface."
+    },
+    {
+        "subject": "Science Lab",
+        "prompt": "What is the most abundant gas in Earth's atmosphere?",
+        "options": "['A) Oxygen', 'B) Carbon Dioxide', 'C) Hydrogen', 'D) Nitrogen']",
+        "correct_answer": "D",
+        "explanation": "Nitrogen makes up about 78% of the atmosphere."
+    },
+    {
+        "subject": "Science Lab",
+        "prompt": "Which human organ is responsible for pumping blood?",
+        "options": "['A) Lungs', 'B) Liver', 'C) Heart', 'D) Kidneys']",
+        "correct_answer": "C",
+        "explanation": "The heart is a muscular organ that pumps blood through the circulatory system."
+    },
+    {
+        "subject": "Science Lab",
+        "prompt": "What is the state of matter that has a fixed volume but no fixed shape?",
+        "options": "['A) Solid', 'B) Liquid', 'C) Gas', 'D) Plasma']",
+        "correct_answer": "B",
+        "explanation": "Liquids take the shape of their container but maintain their volume."
     },
     {
         "subject": "Logic Temple",
         "prompt": "If 5 machines take 5 minutes to make 5 widgets, how long would it take 100 machines to make 100 widgets?",
         "options": "['A) 5 minutes', 'B) 20 minutes', 'C) 100 minutes', 'D) 1 minute']",
         "correct_answer": "A",
-        "explanation": "If 5 machines make 5 widgets in 5 minutes, 1 machine makes 1 widget in 5 minutes. Therefore, 100 machines make 100 widgets in 5 minutes."
+        "explanation": "If 5 machines make 5 widgets in 5 minutes, 1 machine makes 1 widget in 5 minutes."
     },
     {
         "subject": "Logic Temple",
         "prompt": "A farmer has 17 sheep. All but 9 run away. How many sheep does he have left?",
         "options": "['A) 8', 'B) 9', 'C) 17', 'D) 0']",
         "correct_answer": "B",
-        "explanation": "The phrase 'all but 9' means exactly 9 did not run away. So he has 9 left."
+        "explanation": "The phrase 'all but 9' means exactly 9 did not run away."
+    },
+    {
+        "subject": "Logic Temple",
+        "prompt": "What comes next in this sequence? J, F, M, A, M, J, J, __",
+        "options": "['A) A', 'B) S', 'C) O', 'D) N']",
+        "correct_answer": "A",
+        "explanation": "These are the first letters of the months (January, February, March, etc.). The next is August."
+    },
+    {
+        "subject": "Logic Temple",
+        "prompt": "If some Zorbs are Blue, and all Blue things are Round, which statement MUST be true?",
+        "options": "['A) All Zorbs are Round', 'B) Some Zorbs are Round', 'C) All Round things are Zorbs', 'D) No Zorbs are Round']",
+        "correct_answer": "B",
+        "explanation": "Since some blue things are round, and some zorbs are blue, there is an overlap, meaning some zorbs must be round."
+    },
+    {
+        "subject": "Logic Temple",
+        "prompt": "You are in a race and you overtake the person in second place. What place are you in now?",
+        "options": "['A) First', 'B) Second', 'C) Third', 'D) Last']",
+        "correct_answer": "B",
+        "explanation": "You took their place, so you are now in second."
+    },
+    {
+        "subject": "Logic Temple",
+        "prompt": "What number should replace the question mark? 3, 6, 11, 18, 27, __",
+        "options": "['A) 36', 'B) 38', 'C) 40', 'D) 42']",
+        "correct_answer": "B",
+        "explanation": "The differences are 3, 5, 7, 9. The next difference is 11. 27 + 11 = 38."
+    },
+    {
+        "subject": "Logic Temple",
+        "prompt": "A doctor gives you 3 pills and tells you to take one every half hour. How long will they last?",
+        "options": "['A) 1 hour', 'B) 1.5 hours', 'C) 2 hours', 'D) 3 hours']",
+        "correct_answer": "A",
+        "explanation": "You take the first one now, the second in 30 mins, and the third in 60 mins."
     },
     {
         "subject": "Discovery World",
         "prompt": "What is the longest river in the world?",
         "options": "['A) The Amazon', 'B) The Nile', 'C) The Yangtze', 'D) The Mississippi']",
         "correct_answer": "B",
-        "explanation": "While the Amazon is the largest by volume, the Nile is traditionally considered the longest river in the world."
-    },
-    {
-        "subject": "Science Lab",
-        "prompt": "True or False: Sound travels faster in water than in air.",
-        "options": "['A) True', 'B) False']",
-        "correct_answer": "A",
-        "explanation": "Sound travels about 4 times faster in water than in air because water is denser."
+        "explanation": "While the Amazon is the largest by volume, the Nile is traditionally considered the longest."
     },
     {
         "subject": "Discovery World",
-        "prompt": "True or False: The Great Wall of China is visible from space with the naked eye.",
-        "options": "['A) True', 'B) False']",
-        "correct_answer": "B",
-        "explanation": "This is a common myth! The Great Wall is actually very difficult to see from space without aid."
+        "prompt": "Which ancient civilization built the Machu Picchu citadel?",
+        "options": "['A) The Aztecs', 'B) The Mayans', 'C) The Incas', 'D) The Romans']",
+        "correct_answer": "C",
+        "explanation": "Machu Picchu was built by the Inca Empire in the 15th century."
     },
     {
-        "subject": "English Kingdom",
-        "prompt": "True or False: The word 'quickly' is an adjective.",
-        "options": "['A) True', 'B) False']",
+        "subject": "Discovery World",
+        "prompt": "What is the capital city of Japan?",
+        "options": "['A) Beijing', 'B) Seoul', 'C) Bangkok', 'D) Tokyo']",
+        "correct_answer": "D",
+        "explanation": "Tokyo has been the capital of Japan since 1868."
+    },
+    {
+        "subject": "Discovery World",
+        "prompt": "Which continent is the Sahara Desert located in?",
+        "options": "['A) Asia', 'B) Africa', 'C) Australia', 'D) South America']",
         "correct_answer": "B",
-        "explanation": "Quickly is an adverb. It describes how an action is performed."
+        "explanation": "The Sahara is the largest hot desert in the world, located in North Africa."
+    },
+    {
+        "subject": "Discovery World",
+        "prompt": "Who was the first President of the United States?",
+        "options": "['A) Abraham Lincoln', 'B) Thomas Jefferson', 'C) George Washington', 'D) John Adams']",
+        "correct_answer": "C",
+        "explanation": "George Washington served as the first President from 1789 to 1797."
     }
 ]

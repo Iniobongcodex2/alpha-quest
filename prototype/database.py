@@ -21,8 +21,8 @@ class Building(Base):
     id = Column(Integer, primary_key=True, index=True)
     player_id = Column(Integer, ForeignKey("players.id"))
     building_type = Column(String)
-    position_x = Column(Integer, default=0) # <-- NEW: X Coordinate
-    position_y = Column(Integer, default=0) # <-- NEW: Y Coordinate
+    position_x = Column(Integer, default=0) 
+    position_y = Column(Integer, default=0) 
     owner = relationship("Player", back_populates="buildings")
 
 class Question(Base):
@@ -46,17 +46,21 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def seed_data():
     db = SessionLocal()
+    print("Checking for new questions...")
     
-    # ONLY seed if the database is completely empty
-    if db.query(Question).count() == 0:
-        print("Database is empty. Loading questions from JSON...")
-        
-        # Open and read the questions.json file
+    try:
         with open("questions.json", "r", encoding="utf-8") as file:
             questions_data = json.load(file)
-            
-        # Add each question from the JSON to the database
-        for q in questions_data:
+    except FileNotFoundError:
+        print("questions.json not found. Skipping seed.")
+        db.close()
+        return
+        
+    existing_prompts = [q.prompt for q in db.query(Question).all()]
+    
+    new_added_count = 0
+    for q in questions_data:
+        if q["prompt"] not in existing_prompts:
             new_question = Question(
                 subject=q["subject"],
                 prompt=q["prompt"],
@@ -65,11 +69,15 @@ def seed_data():
                 explanation=q["explanation"]
             )
             db.add(new_question)
+            new_added_count += 1
             
-        db.commit()
-        print("Successfully loaded questions from JSON into the database!")
-    
+    db.commit()
     db.close()
+    
+    if new_added_count > 0:
+        print(f"Successfully added {new_added_count} new questions to the database!")
+    else:
+        print("Database is up to date. No new questions to add.")
 
 # Run the seed function when this file loads
 seed_data()
