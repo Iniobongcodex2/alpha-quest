@@ -1,5 +1,5 @@
 // app.js
-
+let currentStreak = 0; 
 let currentQuestions = [];
 let currentQuestionIndex = 0;
 let score = 0;
@@ -8,7 +8,7 @@ let isBossBattle = false;
 let isBrainRush = false;
 let selectedWorld = "All";
 let selectedMode = "normal";
-let wrongAnswersThisGame = []; // <-- NEW: Tracks mistakes for the Results screen
+let wrongAnswersThisGame = []; 
 
 // Timer Variables
 let timerInterval;
@@ -86,7 +86,7 @@ function beginQuiz() {
 async function startGame(mode = "normal", subject = "All") {
     isBossBattle = (mode === "boss");
     isBrainRush = (mode === "rush");
-    wrongAnswersThisGame = []; // Reset mistake tracker for the new game
+    wrongAnswersThisGame = []; 
     
     const inputField = document.getElementById('nickname-input');
     const avatarField = document.getElementById('avatar-select');
@@ -105,10 +105,11 @@ async function startGame(mode = "normal", subject = "All") {
     currentQuestions = data.questions;
     currentQuestionIndex = 0;
     score = 0; 
+    currentStreak = 0; // Reset streak at the start of a new game
 
     document.getElementById('start-btn').style.display = 'none';
     document.getElementById('boss-btn').style.display = 'none';
-    document.getElementById('rush-btn').style.display = 'none'; // Hide rush button
+    document.getElementById('rush-btn').style.display = 'none'; 
     if(inputField) inputField.style.display = 'none'; 
     if(avatarField) avatarField.parentElement.style.display = 'none'; 
     
@@ -117,7 +118,6 @@ async function startGame(mode = "normal", subject = "All") {
     
     document.getElementById('game-screen').style.display = 'block';
 
-    // Show timer container if in Brain Rush
     if (isBrainRush) {
         document.getElementById('timer-container').style.display = 'block';
     } else {
@@ -128,7 +128,7 @@ async function startGame(mode = "normal", subject = "All") {
 }
 
 function showQuestion() {
-    clearInterval(timerInterval); // Clear any existing timer
+    clearInterval(timerInterval); 
 
     const question = currentQuestions[currentQuestionIndex];
 
@@ -153,7 +153,6 @@ function showQuestion() {
         optionsContainer.appendChild(button);
     });
 
-    // Start the timer if in Brain Rush
     if (isBrainRush) {
         timeLeft = TIME_LIMIT;
         document.getElementById('time-left').innerText = timeLeft;
@@ -182,18 +181,18 @@ function timeOut() {
     for (let btn of allButtons) {
         btn.disabled = true;
         if(btn.innerText.match(/[A-D]/)[0] === question.correct_answer) {
-            btn.style.backgroundColor = "#4CAF50"; // Highlight the correct answer
+            btn.style.backgroundColor = "#4CAF50"; 
         }
     }
 
-    // Add to mistake tracker
+    currentStreak = 0; // Break the streak if time runs out
+
     wrongAnswersThisGame.push({
         prompt: question.prompt,
         correct_answer: question.correct_answer,
         explanation: question.explanation
     });
 
-    // Save attempt as wrong
     fetch('/api/save-attempt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -208,7 +207,7 @@ function timeOut() {
 }
 
 function checkAnswer(selectedOption, clickedButton) {
-    clearInterval(timerInterval); // Stop timer when they answer
+    clearInterval(timerInterval); 
 
     const question = currentQuestions[currentQuestionIndex];
     const selectedLetter = selectedOption.match(/[A-D]/)[0];
@@ -221,20 +220,35 @@ function checkAnswer(selectedOption, clickedButton) {
 
     if (selectedLetter === question.correct_answer) {
         playSound('correct'); 
-        feedbackText.innerText = "✅ Correct! " + question.explanation;
+        currentStreak++; // Increase streak!
+        
+        let streakText = "";
+        if (currentStreak === 3) {
+            streakText = " 🔥 3x Streak Bonus! +10 XP";
+            score += 0.5; // Adds 10 XP
+        } else if (currentStreak === 5) {
+            streakText = " 🔥🔥 5x Streak Bonus! +20 XP";
+            score += 1; // Adds 20 XP
+        } else if (currentStreak > 5 && currentStreak % 5 === 0) {
+            streakText = ` 🔥🔥 ${currentStreak}x Streak Bonus! +20 XP`;
+            score += 1;
+        }
+
+        feedbackText.innerText = `✅ Correct!${streakText} ` + question.explanation;
         feedbackText.style.color = "#4CAF50";
         clickedButton.style.backgroundColor = "#4CAF50";
         clickedButton.classList.add("pop");
-        score++;
+        score++; // Base +20 XP
         isCorrect = true;
     } else {
         playSound('incorrect'); 
+        currentStreak = 0; // Break streak on wrong answer
+        
         feedbackText.innerText = "❌ Incorrect. The correct answer was " + question.correct_answer + ". " + question.explanation;
         feedbackText.style.color = "#F44336";
         clickedButton.style.backgroundColor = "#F44336";
         clickedButton.classList.add("shake"); 
         
-        // ADDED: Track the mistake for the Results screen
         wrongAnswersThisGame.push({
             prompt: question.prompt,
             correct_answer: question.correct_answer,
@@ -261,9 +275,9 @@ function nextQuestion() {
     if (currentQuestionIndex < currentQuestions.length) {
         showQuestion();
     } else {
-        clearInterval(timerInterval); // Ensure timer stops
+        clearInterval(timerInterval); 
         
-        let xpEarned = score * 20;
+        let xpEarned = Math.round(score * 20); // Round in case of streak decimals
         
         if (isBossBattle && score >= 12) {
             xpEarned += 100; 
@@ -291,10 +305,8 @@ function nextQuestion() {
         })
         .then(response => response.json())
         .then(data => {
-            // ADDED: Save mistakes to sessionStorage before redirecting
             sessionStorage.setItem('gameMistakes', JSON.stringify(wrongAnswersThisGame));
-            
-            window.location.href = `results.html?nickname=${encodeURIComponent(playerName)}&score=${score}&total=${currentQuestions.length}&xp=${xpEarned}&boss=${isBossBattle}`;
+            window.location.href = `results.html?nickname=${encodeURIComponent(playerName)}&score=${Math.floor(score)}&total=${currentQuestions.length}&xp=${xpEarned}&boss=${isBossBattle}`;
         });
     }
 }
