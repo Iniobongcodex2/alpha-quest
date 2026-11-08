@@ -82,5 +82,26 @@
         "options": "['A) The Amazon', 'B) The Nile', 'C) The Yangtze', 'D) The Mississippi']",
         "correct_answer": "B",
         "explanation": "While the Amazon is the largest by volume, the Nile is traditionally considered the longest river in the world."
+    },
+    {
+        "subject": "Science Lab",
+        "prompt": "True or False: Sound travels faster in water than in air.",
+        "options": "['A) True', 'B) False']",
+        "correct_answer": "A",
+        "explanation": "Sound travels about 4 times faster in water than in air because water is denser."
+    },
+    {
+        "subject": "Discovery World",
+        "prompt": "True or False: The Great Wall of China is visible from space with the naked eye.",
+        "options": "['A) True', 'B) False']",
+        "correct_answer": "B",
+        "explanation": "This is a common myth! The Great Wall is actually very difficult to see from space without aid."
+    },
+    {
+        "subject": "English Kingdom",
+        "prompt": "True or False: The word 'quickly' is an adjective.",
+        "options": "['A) True', 'B) False']",
+        "correct_answer": "B",
+        "explanation": "Quickly is an adverb. It describes how an action is performed."
     }
 ]
