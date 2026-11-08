@@ -1,6 +1,7 @@
 # server.py
 import random
-import astimport csv
+import ast
+import csv
 import io
 from fastapi.responses import StreamingResponse
 from datetime import date
@@ -21,6 +22,8 @@ class SpendData(BaseModel):
     nickname: str
     amount: int
     building_type: str 
+    position_x: int = 0 # <-- NEW
+    position_y: int = 0 # <-- NEW
 
 class AttemptData(BaseModel):
     nickname: str
@@ -157,7 +160,13 @@ def spend_xp(data: SpendData):
     
     player.xp -= data.amount
     
-    new_building = Building(player_id=player.id, building_type=data.building_type)
+    # SAVE COORDINATES
+    new_building = Building(
+        player_id=player.id, 
+        building_type=data.building_type,
+        position_x=data.position_x,
+        position_y=data.position_y
+    )
     db.add(new_building)
     
     db.commit()
@@ -176,7 +185,11 @@ def get_buildings(nickname: str):
     
     buildings = db.query(Building).filter(Building.player_id == player.id).all()
     db.close()
-    return {"buildings": [b.building_type for b in buildings]}
+    
+    # RETURN COORDINATES
+    return {"buildings": [
+        {"type": b.building_type, "x": b.position_x, "y": b.position_y} for b in buildings
+    ]}
 
 @app.get("/api/leaderboard")
 def get_leaderboard():
@@ -261,6 +274,29 @@ def get_student_report(nickname: str):
     db.close()
     return {"report": report_data}
 
+@app.get("/api/teacher/export")
+def export_students_csv():
+    db = SessionLocal()
+    players = db.query(Player).order_by(Player.xp.desc()).all()
+    
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    writer.writerow(["Student ID", "Nickname", "Total XP", "Avatar"])
+    
+    for p in players:
+        writer.writerow([p.id, p.nickname, p.xp, p.avatar])
+        
+    db.close()
+    
+    output.seek(0)
+    
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=alpha_quest_roster.csv"}
+    )
+
 # --- DAILY BONUS API ---
 @app.get("/api/daily-bonus/{nickname}")
 def check_daily_bonus(nickname: str):
@@ -283,7 +319,7 @@ def check_daily_bonus(nickname: str):
         db.close()
         return {"status": "already_claimed", "message": "Come back tomorrow!", "xp_earned": 0}
 
-# --- NEW: MEMORY VAULT DASHBOARD API ---
+# --- MEMORY VAULT DASHBOARD API ---
 @app.get("/api/vault/{nickname}")
 def get_vault(nickname: str):
     db = SessionLocal()
@@ -293,13 +329,11 @@ def get_vault(nickname: str):
         db.close()
         raise HTTPException(status_code=404, detail="Player not found")
         
-    # Get all wrong attempts for this player
     wrong_attempts = db.query(Attempt).filter(
         Attempt.player_id == player.id, 
         Attempt.is_correct == 0
     ).all()
     
-    # Get the actual questions, avoiding duplicates
     vault_data = []
     seen_questions = set()
     
@@ -318,33 +352,6 @@ def get_vault(nickname: str):
                 
     db.close()
     return {"vault": vault_data}
-@app.get("/api/teacher/export")
-def export_students_csv():
-    db = SessionLocal()
-    players = db.query(Player).order_by(Player.xp.desc()).all()
-    
-    # Create an in-memory string buffer to hold the CSV data
-    output = io.StringIO()
-    writer = csv.writer(output)
-    
-    # Write the header row
-    writer.writerow(["Student ID", "Nickname", "Total XP", "Avatar"])
-    
-    # Write the data rows
-    for p in players:
-        writer.writerow([p.id, p.nickname, p.xp, p.avatar])
-        
-    db.close()
-    
-    # Move the cursor to the beginning of the file
-    output.seek(0)
-    
-    # Return the file as a downloadable attachment
-    return StreamingResponse(
-        iter([output.getvalue()]),
-        media_type="text/csv",
-        headers={"Content-Disposition": "attachment; filename=alpha_quest_roster.csv"}
-    )
 
 # --- STATIC FILES (Must be the VERY LAST line) ---
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
