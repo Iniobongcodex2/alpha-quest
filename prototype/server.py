@@ -400,6 +400,55 @@ def buy_avatar(data: BuyAvatarData):
     db.close()
     
     return {"message": "Avatar purchased successfully!", "new_xp": new_xp}
+@app.get("/api/profile/{nickname}")
+def get_profile(nickname: str):
+    db = SessionLocal()
+    player = db.query(Player).filter(Player.nickname == nickname).first()
+    if not player:
+        db.close()
+        raise HTTPException(status_code=404, detail="Player not found")
+
+    # Get all attempts
+    attempts = db.query(Attempt).filter(Attempt.player_id == player.id).all()
+    total_attempts = len(attempts)
+    correct_attempts = sum(1 for a in attempts if a.is_correct == 1)
+
+    # Calculate accuracy
+    accuracy = 0
+    if total_attempts > 0:
+        accuracy = round((correct_attempts / total_attempts) * 100)
+
+    # Calculate favorite subject
+    subject_counts = {"Math World": 0, "English Kingdom": 0, "Science Lab": 0, "Logic Temple": 0, "Discovery World": 0}
+    for a in attempts:
+        if a.is_correct == 1:
+            q = db.query(Question).filter(Question.id == a.question_id).first()
+            if q and q.subject in subject_counts:
+                subject_counts[q.subject] += 1
+
+    favorite_subject = "None yet"
+    max_count = 0
+    for subj, count in subject_counts.items():
+        if count > max_count:
+            max_count = count
+            favorite_subject = subj
+
+    # Count buildings
+    buildings = db.query(Building).filter(Building.player_id == player.id).count()
+
+    db.close()
+
+    return {
+        "nickname": player.nickname,
+        "avatar": player.avatar,
+        "xp": player.xp,
+        "level": (player.xp // 100) + 1,
+        "total_attempts": total_attempts,
+        "correct_attempts": correct_attempts,
+        "accuracy": accuracy,
+        "favorite_subject": favorite_subject,
+        "buildings_built": buildings
+    }
 
 # --- STATIC FILES (Must be the VERY LAST line) ---
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")

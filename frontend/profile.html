@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Alpha Quest</title>
+    <style>
+        body {
+            background-color: #0A1E3D;
+            color: #FFFFFF;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .profile-container {
+            background-color: #1A4B8C;
+            border: 3px solid #C9A84C;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        .avatar-display {
+            font-size: 4rem;
+            background-color: #0A1E3D;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 15px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            border: 3px solid #C9A84C;
+        }
+        h1 { color: #C9A84C; margin: 0 0 5px 0; }
+        .level-tag {
+            background-color: #C9A84C;
+            color: #0A1E3D;
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background-color: #0A1E3D;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #C9A84C;
+            text-align: left;
+        }
+        .stat-title { font-size: 0.8rem; color: #A0AEC0; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #FFFFFF; margin-top: 5px; }
+        
+        /* Make the favorite subject span the full width */
+        .stat-card.full-width { grid-column: span 2; border-left-color: #48BB78; }
+
+        .back-btn {
+            background-color: #2D3748;
+            color: #FFFFFF;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: inline-block;
+            transition: background-color 0.2s;
+        }
+        .back-btn:hover { background-color: #C9A84C; color: #0A1E3D; }
+    </style>
+</head>
+<body>
+
+    <div class="profile-container">
+        <div class="avatar-display" id="profile-avatar">🦊</div>
+        <h1 id="profile-name">Explorer</h1>
+        <div class="level-tag" id="profile-level">Level 1</div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-title">Total XP</div>
+                <div class="stat-value" id="stat-xp">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Accuracy</div>
+                <div class="stat-value" id="stat-accuracy">0%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Questions Answered</div>
+                <div class="stat-value" id="stat-questions">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Buildings Built</div>
+                <div class="stat-value" id="stat-buildings">0</div>
+            </div>
+            <div class="stat-card full-width">
+                <div class="stat-title">Favorite Subject</div>
+                <div class="stat-value" id="stat-favorite">None yet</div>
+            </div>
+        </div>
+
+        <a href="/" class="back-btn">← Back to Home</a>
+    </div>
+
+    <script src="profile.js"></script>
+</body>
+</html>

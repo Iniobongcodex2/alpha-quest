@@ -291,8 +291,8 @@
             <a href="/leaderboard.html" class="leaderboard-link" id="lb-link">View Leaderboard 🏆</a>
             <a href="/rewards.html" class="leaderboard-link" id="rewards-link">View Rewards Room 🏅</a>
             <a href="/vault.html" class="leaderboard-link" id="vault-link">View Memory Vault 🧠</a>
-            <!-- NEW AVATAR SHOP LINK -->
             <a href="/shop.html" class="leaderboard-link" id="shop-link">Visit Avatar Shop 🛍️</a>
+            <a href="/profile.html" class="leaderboard-link" id="profile-link">View My Profile 👤</a> <!-- NEW PROFILE LINK -->
             <a href="/teacher.html" class="teacher-link">Teacher Studio 🔒</a>
         </div>
         
@@ -326,7 +326,8 @@
         const lbLink = document.getElementById('lb-link');
         const rewardsLink = document.getElementById('rewards-link');
         const vaultLink = document.getElementById('vault-link');
-        const shopLink = document.getElementById('shop-link'); // <-- NEW SHOP LINK
+        const shopLink = document.getElementById('shop-link'); 
+        const profileLink = document.getElementById('profile-link'); // <-- NEW PROFILE LINK
         const dailyBtn = document.getElementById('daily-btn');
         
         const profileCard = document.getElementById('profile-card');
@@ -362,7 +363,8 @@
             lbLink.href = `/leaderboard.html?nickname=${encodeURIComponent(name)}`;
             rewardsLink.href = `/rewards.html?nickname=${encodeURIComponent(name)}`;
             vaultLink.href = `/vault.html?nickname=${encodeURIComponent(name)}`;
-            shopLink.href = `/shop.html?nickname=${encodeURIComponent(name)}`; // <-- UPDATE SHOP LINK
+            shopLink.href = `/shop.html?nickname=${encodeURIComponent(name)}`; 
+            profileLink.href = `/profile.html?nickname=${encodeURIComponent(name)}`; // <-- UPDATE PROFILE LINK
             
             if (name.length > 2) {
                 try {
