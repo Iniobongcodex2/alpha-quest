@@ -13,7 +13,7 @@ class Player(Base):
     nickname = Column(String, index=True)
     xp = Column(Integer, default=0)
     avatar = Column(String, default="🦊") 
-    last_bonus_date = Column(String, default="") # <-- NEW: Tracks daily bonus
+    last_bonus_date = Column(String, default="") 
     buildings = relationship("Building", back_populates="owner")
 
 class Building(Base):
@@ -21,6 +21,8 @@ class Building(Base):
     id = Column(Integer, primary_key=True, index=True)
     player_id = Column(Integer, ForeignKey("players.id"))
     building_type = Column(String)
+    position_x = Column(Integer, default=0) # <-- NEW: X Coordinate
+    position_y = Column(Integer, default=0) # <-- NEW: Y Coordinate
     owner = relationship("Player", back_populates="buildings")
 
 class Question(Base):
