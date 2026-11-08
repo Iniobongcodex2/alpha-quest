@@ -12,57 +12,118 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-top: 50px;
+            padding-top: 30px;
             margin: 0;
             padding-left: 20px;
             padding-right: 20px;
             box-sizing: border-box;
         }
-        h1 { color: #C9A84C; text-align: center; } /* Gold */
-        .xp-display {
-            font-size: 1.5rem;
-            margin-bottom: 30px;
-            background-color: #1A4B8C;
-            padding: 15px 30px;
-            border-radius: 10px;
+        h1 { color: #C9A84C; text-align: center; margin-bottom: 10px; }
+        
+        /* --- NEW LEVEL & XP BAR STYLES --- */
+        .level-display {
+            font-size: 1.4rem;
+            color: #C9A84C;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
         }
-        .build-area {
-            background-color: #2D3748; /* Dark Gray */
+        .xp-bar-container {
             width: 100%;
-            max-width: 400px; /* Prevents it from getting too big on desktop */
+            max-width: 350px;
+            height: 20px;
+            background-color: #2D3748;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            border: 2px solid #C9A84C;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .xp-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #C9A84C, #F6E27A);
+            width: 0%; /* JavaScript will update this */
+            transition: width 0.8s ease-in-out;
+        }
+        
+        .xp-display {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            background-color: #1A4B8C;
+            padding: 10px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        /* --- GRID MAP STYLES --- */
+        .build-area {
+            background-color: #2D3748;
+            width: 100%;
+            max-width: 500px;
             height: 300px;
             border-radius: 15px;
             border: 3px dashed #C9A84C;
+            margin-bottom: 20px;
             display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            padding: 10px;
+            box-sizing: border-box;
+            gap: 10px;
+            overflow-y: auto;
+        }
+        .empty-text { width: 100%; text-align: center; margin-top: 120px; color: #A0AEC0; }
+        
+        .building-tile {
+            background-color: #1A4B8C;
+            border: 2px solid #C9A84C;
+            border-radius: 10px;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
+            font-size: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            animation: popIn 0.3s ease-out;
+        }
+        .building-name { font-size: 0.7rem; margin-top: 5px; text-align: center; }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- CONTROLS --- */
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
             margin-bottom: 30px;
-            box-sizing: border-box;
-            text-align: center;
-            padding: 20px;
         }
         button {
             background-color: #1A4B8C;
             color: #FFFFFF;
             border: none;
-            padding: 15px 40px;
-            font-size: 1.2rem;
+            padding: 12px 20px;
+            font-size: 1rem;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            width: 100%;
-            max-width: 300px;
+            transition: transform 0.1s, background-color 0.2s;
         }
-        button:hover { background-color: #C9A84C; color: #0A1E3D; }
-        button:disabled { background-color: #555; cursor: not-allowed; }
+        button:hover:not(:disabled) { background-color: #C9A84C; color: #0A1E3D; transform: scale(1.05); }
+        button:disabled { background-color: #555; cursor: not-allowed; opacity: 0.6; }
         
         .back-link {
             color: #C9A84C; 
             text-decoration: none; 
             font-size: 1.2rem; 
-            margin-top: 20px; 
+            margin-top: 10px; 
             display: inline-block;
+            margin-bottom: 50px;
         }
     </style>
 </head>
@@ -70,15 +131,25 @@
 
     <h1>Knowledge Builder</h1>
     
+    <!-- NEW: LEVEL AND XP BAR -->
+    <div class="level-display" id="level-text">Level 1</div>
+    <div class="xp-bar-container">
+        <div class="xp-bar-fill" id="xp-bar"></div>
+    </div>
     <div class="xp-display">
-        Your XP: <span id="player-xp">Loading...</span>
+        Your XP: <span id="player-xp">0</span>
     </div>
 
     <div class="build-area" id="build-area">
-        <p>Your land is empty.</p>
+        <p class="empty-text">Your land is empty. Start building!</p>
     </div>
 
-    <button id="build-btn" onclick="buildStructure()">Build Library (Cost: 50 XP)</button>
+    <!-- NEW: MULTIPLE BUILDING BUTTONS -->
+    <div class="controls">
+        <button id="btn-library" onclick="buildStructure('Library', 50, '📚')">📚 Library (50 XP)</button>
+        <button id="btn-lab" onclick="buildStructure('Science Lab', 150, '🔬')">🔬 Science Lab (150 XP)</button>
+        <button id="btn-tower" onclick="buildStructure('Math Tower', 300, '📐')">📐 Math Tower (300 XP)</button>
+    </div>
 
     <a href="/" class="back-link">← Back to Home</a>
 
