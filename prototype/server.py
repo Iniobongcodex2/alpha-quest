@@ -199,53 +199,58 @@ def get_badges(nickname: str):
     db = SessionLocal()
     player = db.query(Player).filter(Player.nickname == nickname).first()
     
+    # Master list of all badges
+    all_badges = [
+        {"name": "Bronze Explorer", "icon": "🥉", "description": "Earned 100 XP", "earned": False},
+        {"name": "Silver Scholar", "icon": "🥈", "description": "Earned 500 XP", "earned": False},
+        {"name": "Gold Master", "icon": "🥇", "description": "Earned 1000 XP", "earned": False},
+        {"name": "Boss Slayer", "icon": "👹", "description": "Proved your mastery in a Boss Battle", "earned": False},
+        {"name": "Builder", "icon": "🏗️", "description": "Built your first structure", "earned": False},
+        {"name": "Math Apprentice", "icon": "🧮", "description": "Answered 5 Math questions correctly", "earned": False},
+        {"name": "Word Wizard", "icon": "📖", "description": "Answered 5 English questions correctly", "earned": False},
+        {"name": "Science Explorer", "icon": "🔬", "description": "Answered 5 Science questions correctly", "earned": False},
+        {"name": "Logic Master", "icon": "🧠", "description": "Answered 5 Logic questions correctly", "earned": False},
+        {"name": "Globe Trotter", "icon": "🌍", "description": "Answered 5 Discovery questions correctly", "earned": False}
+    ]
+
     if not player:
         db.close()
-        return {"badges": []}
+        return {"badges": all_badges}
         
-    earned_badges = []
+    earned_names = []
     
-    # 1. XP Milestone Badges
-    if player.xp >= 100:
-        earned_badges.append({"name": "Bronze Explorer", "icon": "🥉", "description": "Earned 100 XP"})
-    if player.xp >= 500:
-        earned_badges.append({"name": "Silver Scholar", "icon": "🥈", "description": "Earned 500 XP"})
-    if player.xp >= 1000:
-        earned_badges.append({"name": "Gold Master", "icon": "🥇", "description": "Earned 1000 XP"})
-    if player.xp >= 400:
-        earned_badges.append({"name": "Boss Slayer", "icon": "👹", "description": "Proved your mastery in a Boss Battle"})
+    if player.xp >= 100: earned_names.append("Bronze Explorer")
+    if player.xp >= 500: earned_names.append("Silver Scholar")
+    if player.xp >= 1000: earned_names.append("Gold Master")
+    if player.xp >= 400: earned_names.append("Boss Slayer")
         
-    # 2. Builder Badge
     buildings = db.query(Building).filter(Building.player_id == player.id).all()
-    if len(buildings) > 0:
-        earned_badges.append({"name": "Builder", "icon": "🏗️", "description": "Built your first structure"})
+    if len(buildings) > 0: earned_names.append("Builder")
 
-    # 3. Subject Mastery Badges
     correct_attempts = db.query(Attempt).filter(
         Attempt.player_id == player.id,
         Attempt.is_correct == 1
     ).all()
     
     subject_counts = {"Math World": 0, "English Kingdom": 0, "Science Lab": 0, "Logic Temple": 0, "Discovery World": 0}
-    
     for attempt in correct_attempts:
         question = db.query(Question).filter(Question.id == attempt.question_id).first()
         if question and question.subject in subject_counts:
             subject_counts[question.subject] += 1
             
-    if subject_counts["Math World"] >= 5:
-        earned_badges.append({"name": "Math Apprentice", "icon": "🧮", "description": "Answered 5 Math questions correctly"})
-    if subject_counts["English Kingdom"] >= 5:
-        earned_badges.append({"name": "Word Wizard", "icon": "📖", "description": "Answered 5 English questions correctly"})
-    if subject_counts["Science Lab"] >= 5:
-        earned_badges.append({"name": "Science Explorer", "icon": "🔬", "description": "Answered 5 Science questions correctly"})
-    if subject_counts["Logic Temple"] >= 5:
-        earned_badges.append({"name": "Logic Master", "icon": "🧠", "description": "Answered 5 Logic questions correctly"})
-    if subject_counts["Discovery World"] >= 5:
-        earned_badges.append({"name": "Globe Trotter", "icon": "🌍", "description": "Answered 5 Discovery questions correctly"})
+    if subject_counts["Math World"] >= 5: earned_names.append("Math Apprentice")
+    if subject_counts["English Kingdom"] >= 5: earned_names.append("Word Wizard")
+    if subject_counts["Science Lab"] >= 5: earned_names.append("Science Explorer")
+    if subject_counts["Logic Temple"] >= 5: earned_names.append("Logic Master")
+    if subject_counts["Discovery World"] >= 5: earned_names.append("Globe Trotter")
 
     db.close()
-    return {"badges": earned_badges}
+    
+    # Mark each badge as earned or locked
+    for badge in all_badges:
+        badge["earned"] = badge["name"] in earned_names
+        
+    return {"badges": all_badges}
 
 # --- TEACHER STUDIO API ---
 @app.get("/api/teacher/students")
