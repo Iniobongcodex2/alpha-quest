@@ -12,7 +12,7 @@ app = FastAPI()
 class ScoreData(BaseModel):
     nickname: str
     xp: int
-    avatar: str = "🦊" # <-- ADDED AVATAR
+    avatar: str = "🦊"
 
 class SpendData(BaseModel):
     nickname: str
@@ -27,10 +27,10 @@ class AttemptData(BaseModel):
 # --- API ROUTES ---
 
 @app.get("/api/questions")
-def get_questions(nickname: str = None, subject: str = None): # <-- ADDED SUBJECT
+def get_questions(nickname: str = None, subject: str = None):
     db = SessionLocal()
     
-    # Filter by selected world/subject
+    # Filter by selected world/subject if provided
     if subject and subject != "All":
         all_questions = db.query(Question).filter(Question.subject == subject).all()
     else:
@@ -39,7 +39,7 @@ def get_questions(nickname: str = None, subject: str = None): # <-- ADDED SUBJEC
     if nickname:
         player = db.query(Player).filter(Player.nickname == nickname).first()
         if player:
-            # Find questions this player got wrong
+            # Find questions this player got wrong (Memory Vault)
             wrong_attempts = db.query(Attempt).filter(
                 Attempt.player_id == player.id, 
                 Attempt.is_correct == 0
@@ -90,9 +90,9 @@ def save_score(data: ScoreData):
     player = db.query(Player).filter(Player.nickname == data.nickname).first()
     if player:
         player.xp += data.xp
-        player.avatar = data.avatar # <-- SAVE AVATAR
+        player.avatar = data.avatar
     else:
-        player = Player(nickname=data.nickname, xp=data.xp, avatar=data.avatar) # <-- SAVE AVATAR
+        player = Player(nickname=data.nickname, xp=data.xp, avatar=data.avatar)
         db.add(player)
     db.commit()
     db.close()
@@ -171,7 +171,7 @@ def get_leaderboard():
     db.close()
     
     leaderboard_data = [
-        {"nickname": p.nickname, "xp": p.xp, "avatar": p.avatar} for p in top_players # <-- RETURN AVATAR
+        {"nickname": p.nickname, "xp": p.xp, "avatar": p.avatar} for p in top_players
     ]
     
     return {"leaderboard": leaderboard_data}
