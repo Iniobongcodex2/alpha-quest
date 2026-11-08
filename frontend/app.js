@@ -4,18 +4,58 @@ let currentQuestions = [];
 let currentQuestionIndex = 0;
 let score = 0;
 let playerName = "Explorer"; 
+let isBossBattle = false; // <-- NEW: Tracks if they are in a boss battle
 
-async function startGame() {
-    const inputField = document.getElementById('nickname-input');
-    if (inputField && inputField.value.trim() !== "") {
-        playerName = inputField.value.trim();
+// --- AUDIO SYNTHESIZER ---
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playSound(type) {
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
     }
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    if (type === 'correct') {
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.3);
+    } else if (type === 'incorrect') {
+        oscillator.type = 'sawtooth';
+        oscillator.frequency.setValueAtTime(150, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.4);
+    }
+}
 
-    const response = await fetch(`/api/questions?nickname=${encodeURIComponent(playerName)}`);
+// --- GAME LOGIC ---
+async function startGame(mode = "normal") {
+    isBossBattle = (mode === "boss");
+    
+    const inputField = document.getElementById('nickname-input');
+    const avatarField = document.getElementById('avatar-select');
+    const subjectField = document.getElementById('subject-select');
+    
+    playerName = inputField ? inputField.value.trim() : "Explorer";
+    if (!playerName) playerName = "Explorer";
+    
+    const selectedSubject = subjectField ? subjectField.value : "All";
+
+    // Send the mode (normal or boss) to the backend
+    const response = await fetch(`/api/questions?nickname=${encodeURIComponent(playerName)}&subject=${encodeURIComponent(selectedSubject)}&mode=${mode}`);
     const data = await response.json();
     
     if (data.questions.length === 0) {
-        alert("No questions available right now.");
+        alert("No questions available for this selection.");
         return;
     }
 
@@ -23,8 +63,13 @@ async function startGame() {
     currentQuestionIndex = 0;
     score = 0; 
 
+    // Hide the start screen elements
     document.getElementById('start-btn').style.display = 'none';
-    if (inputField) inputField.style.display = 'none';
+    document.getElementById('boss-btn').style.display = 'none';
+    if(inputField) inputField.style.display = 'none'; 
+    if(avatarField) avatarField.parentElement.style.display = 'none'; 
+    if(subjectField) subjectField.parentElement.style.display = 'none'; 
+    
     document.getElementById('game-screen').style.display = 'block';
 
     showQuestion();
@@ -33,6 +78,9 @@ async function startGame() {
 function showQuestion() {
     const question = currentQuestions[currentQuestionIndex];
 
+    // Update the progress tracker!
+    document.getElementById('progress-text').innerText = `Question ${currentQuestionIndex + 1} of ${currentQuestions.length}`;
+    
     document.getElementById('question-text').innerText = question.prompt;
     document.getElementById('feedback-text').innerText = "";
     document.getElementById('next-btn').style.display = 'none';
@@ -67,17 +115,22 @@ function checkAnswer(selectedOption, clickedButton) {
     let isCorrect = false;
 
     if (selectedLetter === question.correct_answer) {
+        playSound('correct'); 
         feedbackText.innerText = "✅ Correct! " + question.explanation;
         feedbackText.style.color = "#4CAF50";
         clickedButton.style.backgroundColor = "#4CAF50";
+        clickedButton.classList.add("pop");
         score++;
         isCorrect = true;
     } else {
+        playSound('incorrect'); 
         feedbackText.innerText = "❌ Incorrect. The correct answer was " + question.correct_answer + ". " + question.explanation;
         feedbackText.style.color = "#F44336";
         clickedButton.style.backgroundColor = "#F44336";
+        clickedButton.classList.add("shake"); 
     }
 
+    // SAVE ATTEMPT TO MEMORY VAULT
     fetch('/api/save-attempt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -97,33 +150,37 @@ function nextQuestion() {
     if (currentQuestionIndex < currentQuestions.length) {
         showQuestion();
     } else {
-        document.getElementById('question-text').innerText = "Quest Complete!";
+        // Game Over - Save score and Redirect
+        let xpEarned = score * 20;
+        
+        // Boss Battle Bonus!
+        if (isBossBattle && score >= 12) {
+            xpEarned += 100; // 100 Bonus XP for defeating the boss!
+            alert("🏆 BOSS DEFEATED! You earned 100 Bonus XP!");
+        }
+        
+        document.getElementById('question-text').innerText = "Saving progress...";
         document.getElementById('options-container').innerHTML = "";
-        document.getElementById('feedback-text').innerText = `You scored ${score} out of ${currentQuestions.length}! Saving progress...`;
-        document.getElementById('feedback-text').style.color = "#C9A84C";
+        document.getElementById('feedback-text').innerText = "";
+        document.getElementById('progress-text').innerText = "";
         document.getElementById('next-btn').style.display = 'none';
 
-        const xpEarned = score * 20;
-        
+        const avatarField = document.getElementById('avatar-select');
+        const selectedAvatar = avatarField ? avatarField.value : "🦊";
+
         fetch('/api/save-score', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 nickname: playerName,
-                xp: xpEarned
+                xp: xpEarned,
+                avatar: selectedAvatar
             })
         })
         .then(response => response.json())
         .then(data => {
-            document.getElementById('feedback-text').innerText = `You scored ${score}/${currentQuestions.length}! ${data.message}`;
-            
-            setTimeout(() => {
-                window.location.href = `builder.html?nickname=${encodeURIComponent(playerName)}`;
-            }, 2000);
-        })
-        .catch(error => {
-            console.error('Error saving score:', error);
-            document.getElementById('feedback-text').innerText = `You scored ${score}/${currentQuestions.length}! (Could not save score)`;
+            // Redirect to Results Page with boss data!
+            window.location.href = `results.html?nickname=${encodeURIComponent(playerName)}&score=${score}&total=${currentQuestions.length}&xp=${xpEarned}&boss=${isBossBattle}`;
         });
     }
 }
