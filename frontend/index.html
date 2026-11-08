@@ -74,6 +74,62 @@
         }
         .teacher-link:hover { opacity: 0.9; }
 
+        /* --- PROFILE CARD STYLES --- */
+        .profile-card {
+            display: none; /* Hidden by default */
+            background-color: #1A4B8C;
+            border: 2px solid #C9A84C;
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin: 0 auto 20px auto;
+            max-width: 350px;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            animation: pop 0.3s ease-out;
+        }
+        .profile-avatar {
+            font-size: 3rem;
+            background-color: #0A1E3D;
+            border-radius: 50%;
+            padding: 10px;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #C9A84C;
+        }
+        .profile-info {
+            flex-grow: 1;
+            text-align: left;
+        }
+        .profile-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #FFFFFF;
+            margin-bottom: 5px;
+        }
+        .profile-level {
+            font-size: 0.9rem;
+            color: #C9A84C;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .profile-xp-bar-bg {
+            width: 100%;
+            height: 10px;
+            background-color: #2D3748;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .profile-xp-bar-fill {
+            height: 100%;
+            background-color: #C9A84C;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
         /* --- WORLD MAP STYLES --- */
         .world-map {
             display: grid;
@@ -145,12 +201,11 @@
             100% { transform: translateX(0); }
         }
         @keyframes pop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
         .shake { animation: shake 0.4s ease-in-out; }
-        .pop { animation: pop 0.3s ease-in-out; }
+        .pop-anim { animation: pop 0.3s ease-out; }
 
         @media (max-width: 600px) {
             h1 { font-size: 2.5rem; }
@@ -168,6 +223,18 @@
         <input type="text" id="nickname-input" placeholder="Enter your nickname" style="padding: 10px; font-size: 1rem; border-radius: 5px; border: none; margin-bottom: 15px; text-align: center; width: 250px;">
         <br>
         
+        <!-- PROFILE CARD (Hidden until name is typed) -->
+        <div class="profile-card" id="profile-card">
+            <div class="profile-avatar" id="profile-avatar">🦊</div>
+            <div class="profile-info">
+                <div class="profile-name" id="profile-name">Explorer</div>
+                <div class="profile-level" id="profile-level">Level 1</div>
+                <div class="profile-xp-bar-bg">
+                    <div class="profile-xp-bar-fill" id="profile-xp-bar"></div>
+                </div>
+            </div>
+        </div>
+
         <!-- AVATAR SELECTOR -->
         <div style="margin-bottom: 15px;">
             <label style="font-size: 1.1rem; margin-right: 10px;">Avatar:</label>
@@ -223,6 +290,7 @@
         <div class="nav-links">
             <a href="/leaderboard.html" class="leaderboard-link" id="lb-link">View Leaderboard 🏆</a>
             <a href="/rewards.html" class="leaderboard-link" id="rewards-link">View Rewards Room 🏅</a>
+            <a href="/vault.html" class="leaderboard-link" id="vault-link">View Memory Vault 🧠</a>
             <a href="/teacher.html" class="teacher-link">Teacher Studio 🔒</a>
         </div>
         
@@ -249,33 +317,62 @@
         </div>
     </div>
 
-    <!-- Inline script to update links and check for daily bonus -->
+    <!-- Inline script to update links, profile card, and daily bonus -->
     <script>
         const nameInput = document.getElementById('nickname-input');
         const lbLink = document.getElementById('lb-link');
         const rewardsLink = document.getElementById('rewards-link');
+        const vaultLink = document.getElementById('vault-link');
         const dailyBtn = document.getElementById('daily-btn');
+        
+        const profileCard = document.getElementById('profile-card');
+        const profileAvatar = document.getElementById('profile-avatar');
+        const profileName = document.getElementById('profile-name');
+        const profileLevel = document.getElementById('profile-level');
+        const profileXpBar = document.getElementById('profile-xp-bar');
 
         nameInput.addEventListener('input', async () => {
             const name = nameInput.value.trim() || 'Explorer';
+            
+            // Update links
             lbLink.href = `/leaderboard.html?nickname=${encodeURIComponent(name)}`;
             rewardsLink.href = `/rewards.html?nickname=${encodeURIComponent(name)}`;
+            vaultLink.href = `/vault.html?nickname=${encodeURIComponent(name)}`;
             
-            // If the name is longer than 2 letters, check if the player exists
+            // Check if the name is long enough
             if (name.length > 2) {
                 try {
                     const res = await fetch(`/api/player/${encodeURIComponent(name)}`);
                     if (res.ok) {
-                        // Player exists! Show the bonus button.
+                        const playerData = await res.json();
+                        
+                        // Show daily bonus
                         dailyBtn.style.display = 'block';
+                        
+                        // Update Profile Card
+                        profileName.innerText = playerData.nickname;
+                        profileAvatar.innerText = playerData.avatar || '🦊';
+                        
+                        const xp = playerData.xp;
+                        const level = Math.floor(xp / 100) + 1;
+                        profileLevel.innerText = `Level ${level}`;
+                        
+                        const xpIntoLevel = xp % 100;
+                        profileXpBar.style.width = `${xpIntoLevel}%`;
+                        
+                        profileCard.style.display = 'flex';
                     } else {
-                        dailyBtn.style.display = 'none'; // New player
+                        // New player
+                        dailyBtn.style.display = 'none';
+                        profileCard.style.display = 'none';
                     }
                 } catch(e) {
                     dailyBtn.style.display = 'none';
+                    profileCard.style.display = 'none';
                 }
             } else {
                 dailyBtn.style.display = 'none';
+                profileCard.style.display = 'none';
             }
         });
 
@@ -289,7 +386,10 @@
             
             if (data.status === 'success') {
                 alert("🎉 You earned 50 Free XP!");
-                dailyBtn.style.display = 'none'; // Hide button after claiming
+                dailyBtn.style.display = 'none';
+                
+                // Refresh profile card to show the +50 XP
+                nameInput.dispatchEvent(new Event('input'));
             } else {
                 alert("You already claimed your bonus today! Come back tomorrow.");
                 dailyBtn.style.display = 'none';
