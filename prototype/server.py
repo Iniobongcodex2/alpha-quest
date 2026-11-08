@@ -167,5 +167,33 @@ def get_leaderboard():
     
     return {"leaderboard": leaderboard_data}
 
-# --- STATIC FILES ---
+# --- NEW: REWARDS ROOM (BADGES) API ---
+@app.get("/api/badges/{nickname}")
+def get_badges(nickname: str):
+    db = SessionLocal()
+    player = db.query(Player).filter(Player.nickname == nickname).first()
+    
+    if not player:
+        db.close()
+        return {"badges": []}
+        
+    earned_badges = []
+    
+    # Badge Logic based on XP
+    if player.xp >= 100:
+        earned_badges.append({"name": "Bronze Explorer", "icon": "🥉", "description": "Earned 100 XP"})
+    if player.xp >= 500:
+        earned_badges.append({"name": "Silver Scholar", "icon": "🥈", "description": "Earned 500 XP"})
+    if player.xp >= 1000:
+        earned_badges.append({"name": "Gold Master", "icon": "🥇", "description": "Earned 1000 XP"})
+        
+    # Badge Logic based on Buildings
+    buildings = db.query(Building).filter(Building.player_id == player.id).all()
+    if len(buildings) > 0:
+        earned_badges.append({"name": "Builder", "icon": "🏗️", "description": "Built your first structure"})
+
+    db.close()
+    return {"badges": earned_badges}
+
+# --- STATIC FILES (Must be the VERY LAST line) ---
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
