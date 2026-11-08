@@ -12,6 +12,7 @@ app = FastAPI()
 class ScoreData(BaseModel):
     nickname: str
     xp: int
+    avatar: str = "🦊" # <-- ADDED AVATAR
 
 class SpendData(BaseModel):
     nickname: str
@@ -26,9 +27,14 @@ class AttemptData(BaseModel):
 # --- API ROUTES ---
 
 @app.get("/api/questions")
-def get_questions(nickname: str = None):
+def get_questions(nickname: str = None, subject: str = None): # <-- ADDED SUBJECT
     db = SessionLocal()
-    all_questions = db.query(Question).all()
+    
+    # Filter by selected world/subject
+    if subject and subject != "All":
+        all_questions = db.query(Question).filter(Question.subject == subject).all()
+    else:
+        all_questions = db.query(Question).all()
     
     if nickname:
         player = db.query(Player).filter(Player.nickname == nickname).first()
@@ -84,8 +90,9 @@ def save_score(data: ScoreData):
     player = db.query(Player).filter(Player.nickname == data.nickname).first()
     if player:
         player.xp += data.xp
+        player.avatar = data.avatar # <-- SAVE AVATAR
     else:
-        player = Player(nickname=data.nickname, xp=data.xp)
+        player = Player(nickname=data.nickname, xp=data.xp, avatar=data.avatar) # <-- SAVE AVATAR
         db.add(player)
     db.commit()
     db.close()
@@ -119,7 +126,7 @@ def get_player(nickname: str):
     db.close()
     if not player:
         raise HTTPException(status_code=404, detail="Player not found")
-    return {"nickname": player.nickname, "xp": player.xp}
+    return {"nickname": player.nickname, "xp": player.xp, "avatar": player.avatar}
 
 @app.post("/api/spend-xp")
 def spend_xp(data: SpendData):
@@ -164,7 +171,7 @@ def get_leaderboard():
     db.close()
     
     leaderboard_data = [
-        {"nickname": p.nickname, "xp": p.xp} for p in top_players
+        {"nickname": p.nickname, "xp": p.xp, "avatar": p.avatar} for p in top_players # <-- RETURN AVATAR
     ]
     
     return {"leaderboard": leaderboard_data}
@@ -198,12 +205,11 @@ def get_badges(nickname: str):
 @app.get("/api/teacher/students")
 def get_all_students():
     db = SessionLocal()
-    # Get all players, sorted by highest XP first
     players = db.query(Player).order_by(Player.xp.desc()).all()
     db.close()
     
     student_list = [
-        {"id": p.id, "nickname": p.nickname, "xp": p.xp} for p in players
+        {"id": p.id, "nickname": p.nickname, "xp": p.xp, "avatar": p.avatar} for p in players
     ]
     
     return {"students": student_list}
