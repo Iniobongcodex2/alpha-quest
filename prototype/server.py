@@ -27,19 +27,26 @@ class AttemptData(BaseModel):
 # --- API ROUTES ---
 
 @app.get("/api/questions")
-def get_questions(nickname: str = None, subject: str = None):
+def get_questions(nickname: str = None, subject: str = None, mode: str = None):
     db = SessionLocal()
     
-    # Filter by selected world/subject if provided
+    # 1. Boss Battle Logic
+    question_limit = 10
+    if mode == "boss":
+        question_limit = 15
+        subject = "All" # Boss battles always mix all subjects!
+        
+    # 2. Filter by selected world/subject
     if subject and subject != "All":
         all_questions = db.query(Question).filter(Question.subject == subject).all()
     else:
         all_questions = db.query(Question).all()
     
+    # 3. Memory Vault Logic
     if nickname:
         player = db.query(Player).filter(Player.nickname == nickname).first()
         if player:
-            # Find questions this player got wrong (Memory Vault)
+            # Find questions this player got wrong
             wrong_attempts = db.query(Attempt).filter(
                 Attempt.player_id == player.id, 
                 Attempt.is_correct == 0
@@ -54,18 +61,19 @@ def get_questions(nickname: str = None, subject: str = None):
             random.shuffle(review_questions)
             random.shuffle(other_questions)
             
-            # Memory Vault puts wrong answers first!
+            # Put wrong answers first, then fill with others
             questions = review_questions + other_questions
-            questions = questions[:10] 
+            questions = questions[:question_limit] 
         else:
             random.shuffle(all_questions)
-            questions = all_questions[:10]
+            questions = all_questions[:question_limit]
     else:
         random.shuffle(all_questions)
-        questions = all_questions[:10]
+        questions = all_questions[:question_limit]
 
     db.close()
     
+    # 4. Format for frontend
     formatted_questions = []
     for q in questions:
         try:
@@ -193,6 +201,8 @@ def get_badges(nickname: str):
         earned_badges.append({"name": "Silver Scholar", "icon": "🥈", "description": "Earned 500 XP"})
     if player.xp >= 1000:
         earned_badges.append({"name": "Gold Master", "icon": "🥇", "description": "Earned 1000 XP"})
+    if player.xp >= 400:
+        earned_badges.append({"name": "Boss Slayer", "icon": "👹", "description": "Proved your mastery in a Boss Battle"})
         
     buildings = db.query(Building).filter(Building.player_id == player.id).all()
     if len(buildings) > 0:
