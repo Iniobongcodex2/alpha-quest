@@ -16,6 +16,7 @@ class ScoreData(BaseModel):
 class SpendData(BaseModel):
     nickname: str
     amount: int
+    building_type: str # <-- NEW: Added to accept specific buildings
 
 class AttemptData(BaseModel):
     nickname: str
@@ -134,14 +135,16 @@ def spend_xp(data: SpendData):
         raise HTTPException(status_code=400, detail="Not enough XP")
     
     player.xp -= data.amount
-    new_building = Building(player_id=player.id, building_type="Library")
+    
+    # NEW: Use the building_type sent from the frontend!
+    new_building = Building(player_id=player.id, building_type=data.building_type)
     db.add(new_building)
     
     db.commit()
     new_xp = player.xp
     db.close()
     
-    return {"message": "XP spent and library built!", "new_xp": new_xp}
+    return {"message": f"{data.building_type} built successfully!", "new_xp": new_xp}
 
 @app.get("/api/buildings/{nickname}")
 def get_buildings(nickname: str):
@@ -167,7 +170,7 @@ def get_leaderboard():
     
     return {"leaderboard": leaderboard_data}
 
-# --- NEW: REWARDS ROOM (BADGES) API ---
+# --- REWARDS ROOM (BADGES) API ---
 @app.get("/api/badges/{nickname}")
 def get_badges(nickname: str):
     db = SessionLocal()
