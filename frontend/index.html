@@ -217,6 +217,9 @@
         <!-- BRAIN RUSH BUTTON -->
         <button class="start-button" id="rush-btn" onclick="showMissionBriefing('All', 'rush')" style="background-color: #9F7AEA; margin-top: 15px;">⚡ Brain Rush (Timed Mode)</button>
         
+        <!-- DAILY BONUS BUTTON -->
+        <button class="start-button" id="daily-btn" style="background-color: #48BB78; margin-top: 15px; display: none;">🎁 Claim Daily Bonus (+50 XP)</button>
+
         <div class="nav-links">
             <a href="/leaderboard.html" class="leaderboard-link" id="lb-link">View Leaderboard 🏆</a>
             <a href="/rewards.html" class="leaderboard-link" id="rewards-link">View Rewards Room 🏅</a>
@@ -246,16 +249,51 @@
         </div>
     </div>
 
-    <!-- Inline script to update links with the nickname -->
+    <!-- Inline script to update links and check for daily bonus -->
     <script>
         const nameInput = document.getElementById('nickname-input');
         const lbLink = document.getElementById('lb-link');
         const rewardsLink = document.getElementById('rewards-link');
+        const dailyBtn = document.getElementById('daily-btn');
 
-        nameInput.addEventListener('input', () => {
+        nameInput.addEventListener('input', async () => {
             const name = nameInput.value.trim() || 'Explorer';
             lbLink.href = `/leaderboard.html?nickname=${encodeURIComponent(name)}`;
             rewardsLink.href = `/rewards.html?nickname=${encodeURIComponent(name)}`;
+            
+            // If the name is longer than 2 letters, check if the player exists
+            if (name.length > 2) {
+                try {
+                    const res = await fetch(`/api/player/${encodeURIComponent(name)}`);
+                    if (res.ok) {
+                        // Player exists! Show the bonus button.
+                        dailyBtn.style.display = 'block';
+                    } else {
+                        dailyBtn.style.display = 'none'; // New player
+                    }
+                } catch(e) {
+                    dailyBtn.style.display = 'none';
+                }
+            } else {
+                dailyBtn.style.display = 'none';
+            }
+        });
+
+        // Handle claiming the bonus
+        dailyBtn.addEventListener('click', async () => {
+            const name = nameInput.value.trim();
+            if (!name) return;
+            
+            const res = await fetch(`/api/daily-bonus/${encodeURIComponent(name)}`);
+            const data = await res.json();
+            
+            if (data.status === 'success') {
+                alert("🎉 You earned 50 Free XP!");
+                dailyBtn.style.display = 'none'; // Hide button after claiming
+            } else {
+                alert("You already claimed your bonus today! Come back tomorrow.");
+                dailyBtn.style.display = 'none';
+            }
         });
     </script>
     

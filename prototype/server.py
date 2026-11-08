@@ -1,6 +1,7 @@
 # server.py
 import random
 import ast
+from datetime import date
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -30,11 +31,14 @@ class AttemptData(BaseModel):
 def get_questions(nickname: str = None, subject: str = None, mode: str = None):
     db = SessionLocal()
     
-    # 1. Boss Battle Logic
+    # 1. Boss Battle and Brain Rush Logic
     question_limit = 10
     if mode == "boss":
         question_limit = 15
-        subject = "All" # Boss battles always mix all subjects!
+        subject = "All" 
+    elif mode == "rush":
+        question_limit = 10
+        subject = "All"
         
     # 2. Filter by selected world/subject
     if subject and subject != "All":
@@ -224,7 +228,6 @@ def get_all_students():
     
     return {"students": student_list}
 
-# NEW: Teacher Report API
 @app.get("/api/teacher/report/{nickname}")
 def get_student_report(nickname: str):
     db = SessionLocal()
@@ -234,15 +237,13 @@ def get_student_report(nickname: str):
         db.close()
         raise HTTPException(status_code=404, detail="Student not found")
         
-    # Get all attempts for this student where they got it wrong
     wrong_attempts = db.query(Attempt).filter(
         Attempt.player_id == player.id,
         Attempt.is_correct == 0
     ).all()
     
-    # Get the actual question details for the wrong attempts
     report_data = []
-    seen_questions = set() # To prevent duplicates
+    seen_questions = set() 
     
     for attempt in wrong_attempts:
         if attempt.question_id not in seen_questions:
@@ -253,10 +254,32 @@ def get_student_report(nickname: str):
                     "prompt": question.prompt,
                     "correct_answer": question.correct_answer
                 })
-                seen_questions.add(attempt.question_id)
+                seen_questions.add(question.id)
                 
     db.close()
     return {"report": report_data}
+
+# --- DAILY BONUS API ---
+@app.get("/api/daily-bonus/{nickname}")
+def check_daily_bonus(nickname: str):
+    db = SessionLocal()
+    player = db.query(Player).filter(Player.nickname == nickname).first()
+    
+    if not player:
+        db.close()
+        raise HTTPException(status_code=404, detail="Player not found")
+        
+    today = str(date.today()) 
+    
+    if player.last_bonus_date != today:
+        player.xp += 50
+        player.last_bonus_date = today
+        db.commit()
+        db.close()
+        return {"status": "success", "message": "Daily bonus claimed!", "xp_earned": 50}
+    else:
+        db.close()
+        return {"status": "already_claimed", "message": "Come back tomorrow!", "xp_earned": 0}
 
 # --- STATIC FILES (Must be the VERY LAST line) ---
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
