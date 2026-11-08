@@ -291,6 +291,8 @@
             <a href="/leaderboard.html" class="leaderboard-link" id="lb-link">View Leaderboard 🏆</a>
             <a href="/rewards.html" class="leaderboard-link" id="rewards-link">View Rewards Room 🏅</a>
             <a href="/vault.html" class="leaderboard-link" id="vault-link">View Memory Vault 🧠</a>
+            <!-- NEW AVATAR SHOP LINK -->
+            <a href="/shop.html" class="leaderboard-link" id="shop-link">Visit Avatar Shop 🛍️</a>
             <a href="/teacher.html" class="teacher-link">Teacher Studio 🔒</a>
         </div>
         
@@ -324,6 +326,7 @@
         const lbLink = document.getElementById('lb-link');
         const rewardsLink = document.getElementById('rewards-link');
         const vaultLink = document.getElementById('vault-link');
+        const shopLink = document.getElementById('shop-link'); // <-- NEW SHOP LINK
         const dailyBtn = document.getElementById('daily-btn');
         
         const profileCard = document.getElementById('profile-card');
@@ -341,11 +344,9 @@
         }
         if (savedName) {
             nameInput.value = savedName;
-            // Trigger the input event so the profile card loads automatically
             nameInput.dispatchEvent(new Event('input')); 
         }
 
-        // --- REMEMBER ME: SAVE AVATAR ---
         avatarSelect.addEventListener('change', (e) => {
             localStorage.setItem('aq_avatar', e.target.value);
         });
@@ -353,7 +354,6 @@
         nameInput.addEventListener('input', async () => {
             const name = nameInput.value.trim() || 'Explorer';
             
-            // Save the name if it's long enough
             if (name.length > 2) {
                 localStorage.setItem('aq_nickname', name);
             }
@@ -362,25 +362,22 @@
             lbLink.href = `/leaderboard.html?nickname=${encodeURIComponent(name)}`;
             rewardsLink.href = `/rewards.html?nickname=${encodeURIComponent(name)}`;
             vaultLink.href = `/vault.html?nickname=${encodeURIComponent(name)}`;
+            shopLink.href = `/shop.html?nickname=${encodeURIComponent(name)}`; // <-- UPDATE SHOP LINK
             
-            // Check if the name is long enough
             if (name.length > 2) {
                 try {
                     const res = await fetch(`/api/player/${encodeURIComponent(name)}`);
                     if (res.ok) {
                         const playerData = await res.json();
                         
-                        // Show daily bonus
                         dailyBtn.style.display = 'block';
                         
-                        // --- UPDATE PROFILE CARD WITH ACCESSORIES ---
                         profileName.innerText = playerData.nickname;
                         
                         const xp = playerData.xp;
                         const level = Math.floor(xp / 100) + 1;
                         profileLevel.innerText = `Level ${level}`;
                         
-                        // Calculate Accessory based on Level
                         let accessory = "";
                         if (level >= 10) accessory = "🧙";
                         else if (level >= 5) accessory = "👑";
@@ -394,7 +391,6 @@
                         
                         profileCard.style.display = 'flex';
                     } else {
-                        // New player
                         dailyBtn.style.display = 'none';
                         profileCard.style.display = 'none';
                     }
@@ -408,7 +404,6 @@
             }
         });
 
-        // Handle claiming the bonus
         dailyBtn.addEventListener('click', async () => {
             const name = nameInput.value.trim();
             if (!name) return;
@@ -419,8 +414,6 @@
             if (data.status === 'success') {
                 alert("🎉 You earned 50 Free XP!");
                 dailyBtn.style.display = 'none';
-                
-                // Refresh profile card to show the +50 XP
                 nameInput.dispatchEvent(new Event('input'));
             } else {
                 alert("You already claimed your bonus today! Come back tomorrow.");
